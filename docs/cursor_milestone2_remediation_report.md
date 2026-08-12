@@ -5,7 +5,7 @@
 
 Pre-remediation checkpoint: `b8ae008` / tag `m2-pre-remediation-checkpoint`.
 
-Execution-candidate: **`f80dc53c5d91e9a58d3e2a27daa3d6e7ba2e9ba5`** / tag **`m2-remediated-execution-candidate`** (clean tree).
+Execution-candidate tag: **`m2-remediated-execution-candidate`** (clean tree; resolve commit via `git rev-parse m2-remediated-execution-candidate`).
 
 ---
 
