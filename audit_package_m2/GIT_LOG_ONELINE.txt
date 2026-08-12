@@ -1,0 +1,4 @@
+4d68320 milestone1: complete E00/E01 foundation with toy validation
+2d6fdfe checkpoint: scaffold package, preserve historical reanalysis, Milestone 1 audit
+51284ea docs: freeze ChatGPT-reviewed analysis plan
+5472641 docs: checkpoint phase 1 and consultation request

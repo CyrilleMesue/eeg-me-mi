@@ -1,0 +1,23 @@
+ M docs/final_analysis_plan.md
+ M src/eeg_me_mi/cli.py
+ M src/eeg_me_mi/compare.py
+ M src/eeg_me_mi/cv.py
+ M src/eeg_me_mi/eligibility.py
+ M src/eeg_me_mi/features.py
+ M src/eeg_me_mi/models.py
+ M src/eeg_me_mi/preprocess.py
+?? audit_package_m2/
+?? configs/full.yaml
+?? configs/pilot_m2.yaml
+?? docs/cursor_milestone2_report.md
+?? docs/final_analysis_plan.md.bak-2026-08-12-pre-m2
+?? docs/full_cohort_qc_report.md
+?? slurm/
+?? src/eeg_me_mi/analyses.py
+?? src/eeg_me_mi/benchmark_e07.py
+?? src/eeg_me_mi/cohort.py
+?? src/eeg_me_mi/download.py
+?? src/eeg_me_mi/permutation.py
+?? src/eeg_me_mi/pilot.py
+?? src/eeg_me_mi/rois.py
+?? tests/test_milestone2.py
