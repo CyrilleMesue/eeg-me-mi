@@ -5,6 +5,8 @@
 
 Pre-remediation checkpoint: `b8ae008` / tag `m2-pre-remediation-checkpoint`.
 
+Execution-candidate: **`49b33e85f0d0700ac2fd9f64cceb30d5aba53b51`** / tag **`m2-remediated-execution-candidate`** (clean tree).
+
 ---
 
 ## E00
