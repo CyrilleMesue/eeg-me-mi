@@ -1,0 +1,24 @@
+schema_version: 1
+run_name: full
+seed: 2026
+subjects: {start: 1, stop: 109}
+runs: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+paths:
+  data_root: data/physionet_eegmmidb
+  cache_root: cache
+  output_root: results/full
+preprocessing:
+  l_freq: 8.0
+  h_freq: 30.0
+  target_sfreq: 80.0
+  epoch_tmin: -2.0
+  epoch_tmax: 3.5
+  baseline_tmin: -2.0
+  baseline_tmax: -0.5
+  task_tmin: 0.5
+  task_tmax: 3.5
+  reject_peak_to_peak_uv: 200.0
+cv: {outer_folds: 5, inner_folds: 4, scoring: roc_auc}
+statistics: {bootstrap_replicates: 2000, permutations: 1000}
+models: [dummy, erd_lr, csp_lda, tangent_lr]
+

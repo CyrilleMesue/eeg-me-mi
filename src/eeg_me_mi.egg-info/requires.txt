@@ -1,0 +1,13 @@
+mne<2,>=1.7
+numpy<3,>=1.26
+pandas<3,>=2.1
+scipy<2,>=1.11
+scikit-learn<2,>=1.4
+pyriemann<1,>=0.7
+PyYAML<7,>=6
+matplotlib<4,>=3.8
+seaborn<1,>=0.13
+
+[test]
+pytest<9,>=8
+pytest-cov<7,>=5

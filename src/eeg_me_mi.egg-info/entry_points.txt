@@ -1,0 +1,2 @@
+[console_scripts]
+eeg-me-mi = eeg_me_mi.cli:main

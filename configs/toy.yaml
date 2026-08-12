@@ -1,0 +1,29 @@
+schema_version: 1
+run_name: toy
+seed: 2026
+subjects: [1, 2, 3, 4]
+runs: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+paths:
+  data_root: data/physionet_eegmmidb
+  cache_root: cache
+  output_root: results/toy
+preprocessing:
+  l_freq: 8.0
+  h_freq: 30.0
+  target_sfreq: 80.0
+  epoch_tmin: -2.0
+  epoch_tmax: 3.5
+  baseline_tmin: -2.0
+  baseline_tmax: -0.5
+  task_tmin: 0.5
+  task_tmax: 3.5
+  reject_peak_to_peak_uv: 200.0
+cv:
+  outer_folds: 2
+  inner_folds: 2
+  scoring: roc_auc
+statistics:
+  bootstrap_replicates: 50
+  permutations: 5
+models: [dummy, erd_lr, csp_lda, tangent_lr]
+
