@@ -78,9 +78,9 @@ repaired E01 windows; observed statistic and nulls share the same feature path.
 
 | Item | Value |
 |---|---|
-| Execution-candidate tag | `m2-preexec-fir-windows-candidate` (see git after commit) |
+| Execution-candidate tag | `m2-preexec-fir-windows-candidate` |
 | Clean tree | yes |
-| Config checksum | See `provenance` section filled at commit |
+| Config checksum (SHA-256) | `6c619f6039964085506c22f38d5b35647afacac1143e122868704f37438f795a` |
 | Cache version | **4** (includes baseline/task/e00 window fields) |
 
 ---
