@@ -80,11 +80,10 @@ A participant enters the strict sensitivity cohort when:
 about 15 T1/T2 cues (~7–8 per movement). A movement×mode cell therefore has an
 expected size of roughly 21–24 cues across three matched repetitions. The ≥20
 and ≥80%-of-expected rules are jointly satisfiable for typical event counts
-(typical expected cell counts are ~21–24 across three matched repetitions;
-≥20 is usually binding and jointly implies ≥80% when expected≈21–24).
-There is **no separate “expected ≥25” eligibility rule**. If annotation counts
-make expected cell size &lt;20, that participant fails the strict rule by
-construction; this is not a silent rule change.
+(when expected ≥25, both bind meaningfully; when expected is 21–24, ≥20 is
+binding and implies ≥80%). If a recording’s annotation counts make expected
+cell size &lt;20, that participant fails the strict rule by construction; this is
+not a silent rule change.
 
 ## Frozen preprocessing
 
@@ -95,10 +94,7 @@ construction; this is not a silent rule change.
 - Primary sensorimotor set: FC5/3/1/z/2/4/6, C5/3/1/z/2/4/6,
   CP5/3/1/z/2/4/6 (21 channels).
 - Epoch: -2.0 to 3.5 s around T1/T2.
-- Baseline (E01): -2.0 to -0.5 s.
-- E00 leakage-safe window: -2.0 to -0.8375 s (FIR half-support 0.825 s at 80 Hz;
-  see `docs/e00_filter_support_analysis.md`). Historical -2.0…-0.5 was unsafe under
-  zero-phase filtering.
+- Baseline / E00 window: -2.0 to -0.5 s.
 - Task interval: 0.5 to 3.5 s.
 - Primary gross-artifact screen: 200 µV peak-to-peak.
 - Mandatory artifact sensitivities: 150 µV and no amplitude rejection.
@@ -126,9 +122,7 @@ tuning under the EEGMMIDB protocol.
 42 channel×band ERD features
 → training-fold-only `StandardScaler`
 → L2 logistic regression
-→ inner participant-disjoint tuning of `C ∈ {0.01, 0.1, 1, 10}` by
-  **participant-mean balanced accuracy** (equal weight per validation participant;
-  not epoch-pooled).
+→ inner participant-disjoint tuning of `C ∈ {0.01, 0.1, 1, 10}`.
 
 **No `SelectKBest` (or other supervised feature selection) in the primary
 confirmatory pipeline.**
@@ -148,9 +142,7 @@ does not resolve fixed order or movement-artifact confounding.
 Mandatory negative/control analysis. Terminology: **pre-cue run-state decoding
 control**. Do **not** describe E00 as a biologically neutral baseline.
 
-- Window: −2.0 to −0.8375 s (leakage-safe; no samples within FIR half-support of cue).
-  Shared continuous zero-phase preprocessing retained; E00 crop differs from E01
-  baseline as a control-specific necessity.
+- Window: −2.0 to −0.5 s (no post-cue samples in features).
 - Features: 42 pre-cue log band-power features (mu/beta × 21 channels).
 - Same eligible epochs/participants/outer folds/inner structure/scaler/LR/C
   grid/metrics/participant aggregation as E01 wherever scientifically applicable.
@@ -251,54 +243,3 @@ proved cortical purity, demonstrated online/calibration-free BCI readiness,
 clinical utility, rehabilitation effectiveness, or real-time deployment.
 
 Primary analyses may not be changed in response to outcomes.
-
-
-## Inferential hierarchy (frozen)
-
-| Role | Analysis |
-|---|---|
-| Primary effect estimate | E01 participant-mean balanced accuracy |
-| Primary uncertainty | Participant bootstrap 95% CI for E01 |
-| Primary empirical null support | E07 structured permutation test (one-sided plus-one) |
-| Mandatory protocol-state control | E00 pre-cue run-state decoding |
-| E00 vs E01 | Participant-paired E01−E00 **two-sided** sign-flip control comparison (not independent H1 proof) |
-| E02 | Secondary movement-specific decoding (independent cohorts from full 200 µV metadata) |
-| E03 | Secondary physiology (ROI FDR family separate from channel FDR family) |
-| E04 | Exploratory only |
-| E05 / E06 / E08 | Sensitivity / supplementary / diagnostic |
-| Strict-cohort ERD-LR | **Sensitivity only** (not a new primary) |
-| 128 Hz exclusion (S088/S092/S100) | Optional sampling-rate sensitivity (primary cohort unchanged) |
-
-Do not treat the study as a collection of competing “primary” significance tests.
-
-## E07 interpretation (frozen)
-
-E07 is a **protocol-bound structured association test** under a conditional
-matched-pair exchangeability assumption. It does **not** eliminate the structural
-fact that ME is always the first member of every pair and MI the second.
-A significant E07 result does **not** by itself establish a purely physiological
-execution-versus-imagery effect. Do not describe E07 as “controlling for” or
-“removing” run order.
-
-Plus-one one-sided p-value:
-
-\[
-p = \frac{1 + \#(T_{\mathrm{perm}} \ge T_{\mathrm{obs}})}{1 + N_{\mathrm{perm}}}
-\]
-
-For 1,000 completed permutations the denominator is 1001. Nested C tuning is
-rerun under each permutation. Observed statistic must equal definitive E01
-participant-mean balanced accuracy.
-
-## E00–E01 test tail (frozen)
-
-E01−E00 uses a **two-sided** participant-level paired sign-flip test.
-E07 uses a **one-sided** above-null comparison. Different scientific questions;
-tails are not chosen after seeing definitive results.
-
-## E03 labeling (frozen)
-
-Percentile ranges of participant effects are **distributional summaries**, not
-confidence intervals for the mean. Mean participant effects use participant-level
-bootstrap CIs. FDR is applied separately within the ROI-level family and within
-the channel-level exploratory family.

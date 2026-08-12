@@ -91,21 +91,56 @@ def e03_roi_and_channel_effects(erd_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.
     roi_df = pd.DataFrame(rows_roi)
     ch_df = pd.DataFrame(rows_ch)
 
-    def _summarize(frame: pd.DataFrame, group_cols: list[str]) -> pd.DataFrame:
+    def _summarize(
+        frame: pd.DataFrame,
+        group_cols: list[str],
+        *,
+        fdr_family: str,
+        n_bootstrap: int = 2000,
+        seed: int = 2026,
+    ) -> pd.DataFrame:
+        """Summarize participant effects.
+
+        Percentile columns describe the **distribution of participant effects**,
+        not a confidence interval for the mean. Bootstrap CIs are reported
+        separately for the mean participant effect.
+        """
         out = []
         for keys, g in frame.groupby(group_cols):
             if not isinstance(keys, tuple):
                 keys = (keys,)
             vals = g["me_minus_mi"].to_numpy(dtype=float)
+            vals = vals[np.isfinite(vals)]
             row = dict(zip(group_cols, keys))
+            mean_effect = float(np.nanmean(vals)) if len(vals) else float("nan")
+            # Participant-level bootstrap CI for the mean effect.
+            if len(vals) >= 2:
+                rng = np.random.default_rng(seed + (abs(hash(keys)) % 10_000))
+                boots = np.empty(n_bootstrap, dtype=float)
+                for i in range(n_bootstrap):
+                    idx = rng.integers(0, len(vals), size=len(vals))
+                    boots[i] = float(np.mean(vals[idx]))
+                boot_low = float(np.percentile(boots, 2.5))
+                boot_high = float(np.percentile(boots, 97.5))
+            else:
+                boot_low = boot_high = float("nan")
             row.update(
                 {
                     "n": int(len(vals)),
-                    "mean": float(np.nanmean(vals)),
-                    "std": float(np.nanstd(vals)),
-                    "ci_low": float(np.nanpercentile(vals, 2.5)) if len(vals) else np.nan,
-                    "ci_high": float(np.nanpercentile(vals, 97.5)) if len(vals) else np.nan,
+                    "mean": mean_effect,
+                    "std": float(np.nanstd(vals)) if len(vals) else float("nan"),
+                    # Distribution of participant effects (NOT a CI for the mean).
+                    "participant_effect_p2.5": float(np.nanpercentile(vals, 2.5))
+                    if len(vals)
+                    else float("nan"),
+                    "participant_effect_p97.5": float(np.nanpercentile(vals, 97.5))
+                    if len(vals)
+                    else float("nan"),
+                    # Inferential interval for the mean participant effect.
+                    "mean_bootstrap_ci_low": boot_low,
+                    "mean_bootstrap_ci_high": boot_high,
                     "p_uncorrected": _safe_wilcoxon(vals),
+                    "fdr_family": fdr_family,
                 }
             )
             out.append(row)
@@ -120,8 +155,15 @@ def e03_roi_and_channel_effects(erd_df: pd.DataFrame) -> tuple[pd.DataFrame, pd.
             summary["reject_fdr"] = False
         return summary
 
-    roi_summary = _summarize(roi_df, ["band", "roi"]) if len(roi_df) else pd.DataFrame()
-    ch_summary = _summarize(ch_df, ["band", "channel"]) if len(ch_df) else pd.DataFrame()
+    # Multiplicity: ROI-level FDR family and channel-level FDR family are separate.
+    roi_summary = (
+        _summarize(roi_df, ["band", "roi"], fdr_family="roi_level") if len(roi_df) else pd.DataFrame()
+    )
+    ch_summary = (
+        _summarize(ch_df, ["band", "channel"], fdr_family="channel_level_exploratory")
+        if len(ch_df)
+        else pd.DataFrame()
+    )
     return roi_df, roi_summary, ch_summary
 
 

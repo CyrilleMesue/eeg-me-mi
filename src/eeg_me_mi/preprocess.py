@@ -29,9 +29,21 @@ def _cache_key(preproc: dict[str, Any], channels: Sequence[str], *, mode: str) -
         "target_sfreq": preproc["target_sfreq"],
         "epoch_tmin": preproc["epoch_tmin"],
         "epoch_tmax": preproc["epoch_tmax"],
+        "baseline_tmin": preproc.get("baseline_tmin"),
+        "baseline_tmax": preproc.get("baseline_tmax"),
+        "task_tmin": preproc.get("task_tmin"),
+        "task_tmax": preproc.get("task_tmax"),
+        "e00_tmin": preproc.get("e00_tmin"),
+        "e00_tmax": preproc.get("e00_tmax"),
         "reject_peak_to_peak_uv": preproc.get("reject_peak_to_peak_uv"),
+        "reference": "average",
+        "montage": "standard_1005",
+        "filter_method": "fir",
+        "fir_design": "firwin",
+        "phase": "zero",
         "channels": list(channels),
-        "version": 2,
+        "mne_version": mne.__version__,
+        "version": 3,
     }
     digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
     return digest[:12]
@@ -44,10 +56,10 @@ def subject_cache_paths(
     *,
     channels: Sequence[str] = SENSORIMOTOR_CHANNELS,
     mode: str = "rejected",
-) -> tuple[Path, Path]:
+) -> tuple[Path, Path, Path]:
     key = _cache_key(preproc, channels, mode=mode)
     folder = cache_root / f"preproc_{mode}_{key}" / f"S{subject:03d}"
-    return folder / "epochs-epo.fif", folder / "qc.json"
+    return folder / "epochs-epo.fif", folder / "qc.json", folder / "cache_manifest.json"
 
 
 def load_and_preprocess_raw(
@@ -218,19 +230,75 @@ def process_subject(
     force: bool = False,
     channels: Sequence[str] = SENSORIMOTOR_CHANNELS,
     mode: str = "rejected",
+    project_root: Path | None = None,
 ) -> tuple[mne.Epochs | None, list[dict[str, Any]]]:
+    from eeg_me_mi.audit import ensure_edf
+    from eeg_me_mi.provenance import (
+        build_cache_manifest,
+        file_fingerprint,
+        validate_cache_manifest,
+    )
+
     apply_reject = mode != "minimal"
     preproc_for_cache = dict(preproc)
     if mode == "minimal":
         preproc_for_cache = {**preproc, "reject_peak_to_peak_uv": None}
 
-    epo_path, qc_path = subject_cache_paths(
+    epo_path, qc_path, manifest_path = subject_cache_paths(
         cache_root, subject, preproc_for_cache, channels=channels, mode=mode
     )
-    if epo_path.exists() and qc_path.exists() and not force:
-        epochs = mne.read_epochs(epo_path, preload=True, verbose=False)
-        qc = json.loads(qc_path.read_text(encoding="utf-8"))
-        return epochs if len(epochs) else None, qc
+
+    # Build expected identity (EDF fingerprints) before accepting a cache hit.
+    edf_fps = []
+    ann_parts = []
+    for run in runs:
+        path = ensure_edf(data_root, subject, run, download=download)
+        if path is None:
+            edf_fps.append({"run": run, "exists": False})
+            continue
+        edf_fps.append({"run": int(run), **file_fingerprint(path)})
+        try:
+            raw_ann = read_raw_edf(path, preload=False, verbose=False)
+            anns = [
+                (float(a["onset"]), float(a["duration"]), str(a["description"]))
+                for a in raw_ann.annotations
+            ]
+            ann_parts.append(f"{run}:{anns}")
+            del raw_ann
+        except Exception:  # noqa: BLE001
+            ann_parts.append(f"{run}:unreadable")
+    ann_fp = hashlib.sha256("|".join(ann_parts).encode("utf-8")).hexdigest()
+    expected_manifest = build_cache_manifest(
+        subject=subject,
+        runs=runs,
+        preproc=preproc_for_cache,
+        channels=channels,
+        mode=mode,
+        edf_fingerprints=edf_fps,
+        annotation_fingerprint=ann_fp,
+        project_root=project_root,
+    )
+
+    if epo_path.exists() and qc_path.exists() and manifest_path.exists() and not force:
+        stored = json.loads(manifest_path.read_text(encoding="utf-8"))
+        # Compare scientifically meaningful fields; allow git_commit drift on reuse
+        # of identical preprocessing, but not preprocessing / EDF identity drift.
+        try:
+            validate_cache_manifest(
+                stored,
+                expected_manifest,
+                require_keys=("version", "mode", "channels", "preprocessing", "mne_version"),
+            )
+            if stored.get("annotation_fingerprint") != expected_manifest["annotation_fingerprint"]:
+                raise RuntimeError("annotation fingerprint mismatch")
+            if stored.get("edf_fingerprints") != expected_manifest["edf_fingerprints"]:
+                raise RuntimeError("EDF fingerprint mismatch")
+            epochs = mne.read_epochs(epo_path, preload=True, verbose=False)
+            qc = json.loads(qc_path.read_text(encoding="utf-8"))
+            return epochs if len(epochs) else None, qc
+        except RuntimeError:
+            # Incompatible cache — fall through to rebuild.
+            pass
 
     run_epochs: list[mne.Epochs] = []
     logs: list[dict[str, Any]] = []
@@ -256,11 +324,17 @@ def process_subject(
         combined.metadata = combined.metadata.reset_index(drop=True)
         combined.save(epo_path, overwrite=True, verbose=False)
         qc_path.write_text(json.dumps(logs, indent=2), encoding="utf-8")
+        manifest_path.write_text(
+            json.dumps(expected_manifest, indent=2, default=str), encoding="utf-8"
+        )
         del run_epochs
         gc.collect()
         return combined, logs
 
     qc_path.write_text(json.dumps(logs, indent=2), encoding="utf-8")
+    manifest_path.write_text(
+        json.dumps(expected_manifest, indent=2, default=str), encoding="utf-8"
+    )
     del run_epochs
     gc.collect()
     return None, logs

@@ -8,6 +8,11 @@ from sklearn.base import clone
 from sklearn.model_selection import GridSearchCV, KFold
 
 from eeg_me_mi.metrics import compute_metrics, continuous_score, participant_mean_metrics, participant_metric_table
+from eeg_me_mi.scoring import participant_mean_balanced_accuracy
+
+
+# Frozen primary inner-tuning criterion (aligned with outer estimand).
+PARTICIPANT_MEAN_SCORING = "participant_mean_balanced_accuracy"
 
 
 def make_group_folds(groups: np.ndarray, n_splits: int, seed: int):
@@ -62,6 +67,45 @@ def _inner_cv(train_groups: np.ndarray, n_splits: int, seed: int):
     return list(KFold(n_splits=n_splits, shuffle=True, random_state=seed).split(unique))
 
 
+def _tune_participant_mean_c(
+    estimator,
+    param_grid: dict,
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    g_train: np.ndarray,
+    inner_folds_idx: list[tuple[np.ndarray, np.ndarray]],
+) -> tuple[object, dict, float]:
+    """Select C by mean of per-participant validation BAcc (equal weight)."""
+    if set(param_grid.keys()) != {"clf__C"}:
+        raise ValueError(
+            "Participant-mean tuning currently supports only {'clf__C': [...]} grids"
+        )
+    c_values = list(param_grid["clf__C"])
+    best_score = -np.inf
+    best_c = c_values[0]
+    for c in c_values:
+        fold_scores: list[float] = []
+        for tr_idx, va_idx in inner_folds_idx:
+            pipe = clone(estimator)
+            pipe.set_params(clf__C=c)
+            pipe.fit(X_train[tr_idx], y_train[tr_idx])
+            pred = pipe.predict(X_train[va_idx])
+            fold_scores.append(
+                participant_mean_balanced_accuracy(
+                    y_train[va_idx], pred, g_train[va_idx]
+                )
+            )
+        mean_score = float(np.mean(fold_scores))
+        # Deterministic tie-break: first grid entry wins on equality (stable order).
+        if mean_score > best_score:
+            best_score = mean_score
+            best_c = c
+    best = clone(estimator)
+    best.set_params(clf__C=best_c)
+    best.fit(X_train, y_train)
+    return best, {"clf__C": best_c}, float(best_score)
+
+
 def run_nested_group_cv(
     *,
     experiment: str,
@@ -75,7 +119,7 @@ def run_nested_group_cv(
     outer_folds: int,
     inner_folds: int,
     seed: int,
-    scoring: str = "balanced_accuracy",
+    scoring: str = PARTICIPANT_MEAN_SCORING,
 ) -> dict:
     """Nested participant-disjoint CV with leakage assertions."""
     X = np.asarray(X)
@@ -101,7 +145,6 @@ def run_nested_group_cv(
 
         pipe = clone(estimator)
         if param_grid:
-            # Build participant-disjoint inner splits over training participants only.
             unique_train = np.unique(g_train)
             inner_splitter = KFold(
                 n_splits=min(inner_folds, len(unique_train)),
@@ -113,40 +156,52 @@ def run_nested_group_cv(
                 tr_part = unique_train[tr_g]
                 va_part = unique_train[va_g]
                 assert set(tr_part).isdisjoint(set(va_part))
-                # Map participant splits back to epoch indices within outer-train.
                 tr_idx = np.flatnonzero(np.isin(g_train, tr_part))
                 va_idx = np.flatnonzero(np.isin(g_train, va_part))
                 inner_folds_idx.append((tr_idx, va_idx))
 
-            search = GridSearchCV(
-                estimator=pipe,
-                param_grid=param_grid,
-                scoring=scoring,
-                cv=inner_folds_idx,
-                refit=True,
-                n_jobs=1,
-            )
-            search.fit(X_train, y_train)
-            best = search.best_estimator_
+            if scoring == PARTICIPANT_MEAN_SCORING or scoring == "balanced_accuracy":
+                # Frozen scientific criterion: participant-mean BAcc.
+                # ``balanced_accuracy`` alias retained for config compatibility but
+                # now resolves to participant-equal selection (not epoch-pooled).
+                best, best_params, best_score = _tune_participant_mean_c(
+                    pipe, param_grid, X_train, y_train, g_train, inner_folds_idx
+                )
+            else:
+                # Legacy non-primary paths only (should not appear in definitive config).
+                search = GridSearchCV(
+                    estimator=pipe,
+                    param_grid=param_grid,
+                    scoring=scoring,
+                    cv=inner_folds_idx,
+                    refit=True,
+                    n_jobs=1,
+                )
+                search.fit(X_train, y_train)
+                best = search.best_estimator_
+                best_params = search.best_params_
+                best_score = float(search.best_score_)
+
             tuning_rows.append(
                 {
                     "experiment": experiment,
                     "model": model_name,
                     "fold": fold,
-                    "best_params": str(search.best_params_),
-                    "best_inner_score": float(search.best_score_),
+                    "best_params": str(best_params),
+                    "best_inner_score": float(best_score),
+                    "inner_scoring": PARTICIPANT_MEAN_SCORING
+                    if scoring in {PARTICIPANT_MEAN_SCORING, "balanced_accuracy"}
+                    else scoring,
                     "train_subjects": "|".join(map(str, map(int, sorted(train_groups)))),
                     "test_subjects": "|".join(map(str, map(int, sorted(test_groups)))),
                 }
             )
-            # Prove scaler saw training-fold data only (2D feature matrices).
             if "scaler" in best.named_steps:
                 scaler = best.named_steps["scaler"]
                 assert hasattr(scaler, "mean_")
                 if X_train.ndim == 2:
                     assert scaler.n_features_in_ == X_train.shape[1]
                 else:
-                    # 3D epoch inputs: scaler sits after CSP/TS dimensionality change.
                     assert scaler.n_features_in_ == len(scaler.mean_)
         else:
             best = pipe
@@ -158,6 +213,7 @@ def run_nested_group_cv(
                     "fold": fold,
                     "best_params": "{}",
                     "best_inner_score": np.nan,
+                    "inner_scoring": "",
                     "train_subjects": "|".join(map(str, map(int, sorted(train_groups)))),
                     "test_subjects": "|".join(map(str, map(int, sorted(test_groups)))),
                 }

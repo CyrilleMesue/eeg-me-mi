@@ -343,3 +343,27 @@ def filter_eligible_epochs(
         runs = {r for pair in pairs for r in pair}
         keep_idx.extend(sub_meta.loc[sub_meta["run"].isin(runs)].index.tolist())
     return metadata.loc[sorted(keep_idx)].copy()
+
+
+def filter_e02_epochs(
+    metadata: pd.DataFrame,
+    eligibility: pd.DataFrame,
+    audit: pd.DataFrame,
+    analysis: str,
+) -> pd.DataFrame:
+    """Build an E02 analysis cohort from the full 200 µV metadata.
+
+    Does **not** first restrict to the E01-primary cohort. Each E02 analysis
+    uses its own independently frozen eligibility flag.
+    """
+    if analysis not in E02_ANALYSES:
+        raise ValueError(f"Unknown E02 analysis: {analysis}")
+    col = f"e02_{analysis}_eligible"
+    base = filter_eligible_epochs(metadata, eligibility, audit, eligible_col=col)
+    if base.empty:
+        return base
+    if analysis in MOVEMENTS:
+        return base.loc[base["movement"] == analysis].copy()
+    if analysis == "unilateral":
+        return base.loc[base["task_family"] == "unilateral"].copy()
+    return base.loc[base["task_family"] == "bilateral"].copy()

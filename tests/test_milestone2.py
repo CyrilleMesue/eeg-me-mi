@@ -108,12 +108,15 @@ def test_matched_pair_permutation_structure_and_reproducibility():
         }
     )
     y = meta["label"].to_numpy()
-    a = matched_pair_label_permutation(meta, y, seed=2026, perm_id=3)
-    b = matched_pair_label_permutation(meta, y, seed=2026, perm_id=3)
+    a, swap_a = matched_pair_label_permutation(meta, y, seed=2026, perm_id=3)
+    b, swap_b = matched_pair_label_permutation(meta, y, seed=2026, perm_id=3)
     assert np.array_equal(a, b)
+    assert swap_a == swap_b
     assert_permutation_preserves_structure(meta, y, a)
-    # Subjects unchanged
-    assert meta["subject"].tolist() == meta["subject"].tolist()
+    # Subjects / movement / runs unchanged in metadata
+    assert list(meta["subject"]) == ([1] * 20 + [2] * 20)
+    assert set(meta["movement"]) == {"left_fist", "both_fists"}
+    assert set(meta["run"]) == {3, 4, 5, 6}
     perms = generate_permutation_labels(meta, y, 5, 2026)
     assert len(perms) == 5
 

@@ -3,7 +3,6 @@
 import numpy as np
 import pytest
 from mne import create_info
-from mne.io.array import RawArray
 import mne
 
 from eeg_me_mi.features import (
@@ -19,8 +18,13 @@ from eeg_me_mi.protocol import SENSORIMOTOR_CHANNELS
 
 
 PREPROC = {
+    "l_freq": 8.0,
+    "h_freq": 30.0,
+    "target_sfreq": 80.0,
     "baseline_tmin": -2.0,
     "baseline_tmax": -0.5,
+    "e00_tmin": -2.0,
+    "e00_tmax": -0.8375,
     "task_tmin": 0.5,
     "task_tmax": 3.5,
     "epoch_tmin": -2.0,
@@ -32,13 +36,11 @@ def _make_epochs(n_epochs: int = 4, sfreq: float = 80.0):
     info = create_info(list(SENSORIMOTOR_CHANNELS), sfreq=sfreq, ch_types="eeg")
     n_times = int(round((PREPROC["epoch_tmax"] - PREPROC["epoch_tmin"]) * sfreq)) + 1
     data = np.random.default_rng(0).normal(scale=1e-5, size=(n_epochs, len(SENSORIMOTOR_CHANNELS), n_times))
-    # Inject mu-band oscillation in task window for realism.
     times = PREPROC["epoch_tmin"] + np.arange(n_times) / sfreq
     task = (times >= 0.5) & (times <= 3.5)
     for ch in range(len(SENSORIMOTOR_CHANNELS)):
         data[:, ch, task] += 2e-5 * np.sin(2 * np.pi * 10 * times[task])
 
-    # Build via EpochsArray
     epochs = mne.EpochsArray(
         data,
         info,
@@ -78,12 +80,16 @@ def test_e01_and_e00_shapes_finite():
     assert np.isfinite(X0).all()
 
 
-def test_e00_rejects_postcue_window(monkeypatch):
+def test_e00_rejects_postcue_and_leaky_window():
     epochs = _make_epochs()
     bad = dict(PREPROC)
-    bad["baseline_tmax"] = 0.5  # would include post-cue
-    with pytest.raises(ValueError, match="post-cue"):
+    bad["e00_tmax"] = 0.5
+    with pytest.raises(ValueError):
         extract_e00_log_bandpower_features(epochs, bad)
+    leaky = dict(PREPROC)
+    leaky["e00_tmax"] = -0.5  # historical unsafe crop
+    with pytest.raises(ValueError, match="half-support"):
+        extract_e00_log_bandpower_features(epochs, leaky)
 
 
 def test_e01_windows_separated():

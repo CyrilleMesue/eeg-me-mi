@@ -54,10 +54,11 @@ def paired_signflip_test(
     n_signflips: int = 1000,
     seed: int = 2026,
 ) -> dict:
-    """Participant-level paired sign-flip / randomization test on differences.
+    """Two-sided participant-level paired sign-flip test on E01 − E00 differences.
 
-    Under the null that the mean paired difference is zero, randomly flip the
-    sign of each participant's difference and recompute the mean. Plus-one p.
+    Frozen question: is the mean paired difference nonzero?  Uses a
+    **two-sided** plus-one p-value.  This is distinct from E07, which uses a
+    one-sided above-null comparison for the primary decoding statistic.
     """
     d = np.asarray(differences, dtype=float)
     d = d[np.isfinite(d)]
@@ -69,13 +70,18 @@ def paired_signflip_test(
     for i in range(n_signflips):
         signs = rng.choice(np.array([-1.0, 1.0]), size=len(d))
         null[i] = float(np.mean(signs * d))
-    # Two-sided plus-one p-value
+    # Two-sided plus-one p-value (frozen for E00–E01 control comparison)
     p = (1 + np.sum(np.abs(null) >= abs(observed))) / (n_signflips + 1)
     return {
         "observed_mean_difference": observed,
         "n_participants": int(len(d)),
         "n_signflips": int(n_signflips),
+        "alternative": "two-sided",
         "p_value_plusone": float(p),
         "null_mean": float(np.mean(null)),
         "null_std": float(np.std(null)),
+        "note": (
+            "E00–E01 uses two-sided paired sign-flip; E07 uses one-sided "
+            "structured permutation. Different scientific questions."
+        ),
     }

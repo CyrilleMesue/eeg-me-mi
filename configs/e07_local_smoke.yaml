@@ -1,15 +1,12 @@
-# TRUBA / HPC resource overlay — scientific parameters MUST match configs/full.yaml.
-# This file only overrides paths and may document resource hints; it must not
-# diverge on scoring, cohorts, preprocessing, or model grids.
 schema_version: 1
-run_name: full
+run_name: e07_local_smoke
 seed: 2026
-subjects: {start: 1, stop: 109}
+subjects: [1, 2, 3, 4, 5, 6, 7, 8]
 runs: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 paths:
   data_root: data/physionet_eegmmidb
   cache_root: cache
-  output_root: results/full
+  output_root: results/e07_local_smoke
 preprocessing:
   l_freq: 8.0
   h_freq: 30.0
@@ -24,20 +21,15 @@ preprocessing:
   task_tmax: 3.5
   reject_peak_to_peak_uv: 200.0
 cv:
-  outer_folds: 5
-  inner_folds: 4
+  outer_folds: 4
+  inner_folds: 3
   scoring: participant_mean_balanced_accuracy
 statistics:
-  bootstrap_replicates: 2000
-  permutations: 1000
+  bootstrap_replicates: 50
+  permutations: 5
 eligibility:
   min_epochs_per_mode: 30
   e02_min_epochs_per_mode: 15
   e02_min_matched_pairs: 2
 logistic_c_grid: [0.01, 0.1, 1.0, 10.0]
-models: [dummy, erd_lr, csp_lda, tangent_lr]
-# Resource notes (not scientific): E07 is single-worker nested CV; request 2 CPUs.
-resources:
-  e07_cpus: 2
-  e07_mem_gb: 16
-  e07_walltime_hours: 24
+models: [dummy, erd_lr]

@@ -23,7 +23,7 @@ from eeg_me_mi.audit import audit_subjects
 from eeg_me_mi.compare import compare_e00_e01, paired_signflip_test
 from eeg_me_mi.config import AnalysisConfig, load_config
 from eeg_me_mi.cv import assert_participant_disjoint, fold_assignment_table, run_nested_group_cv
-from eeg_me_mi.eligibility import E02_ANALYSES, evaluate_eligibility, filter_eligible_epochs
+from eeg_me_mi.eligibility import E02_ANALYSES, evaluate_eligibility, filter_e02_epochs, filter_eligible_epochs
 from eeg_me_mi.features import (
     extract_e00_log_bandpower_features,
     extract_e01_erd_features,
@@ -191,24 +191,18 @@ def run_pilot(
     )
     write_json(output_root / "comparisons" / "e00_vs_e01_signflip.json", signflip)
 
-    # E02
+    # E02 — independent cohorts from full 200 µV metadata (not E01-primary subset)
     t0 = time.perf_counter()
     for analysis in E02_ANALYSES:
-        col = f"e02_{analysis}_eligible"
-        subs = set(elig.loc[elig[col].astype(bool), "subject"].astype(int))
-        if analysis in {"left_fist", "right_fist", "both_fists", "both_feet"}:
-            mask = meta["subject"].isin(subs) & (meta["movement"] == analysis)
-        elif analysis == "unilateral":
-            mask = meta["subject"].isin(subs) & (meta["task_family"] == "unilateral")
-        else:
-            mask = meta["subject"].isin(subs) & (meta["task_family"] == "bilateral")
-        if mask.sum() == 0 or meta.loc[mask, "subject"].nunique() < outer:
+        e02_meta = filter_e02_epochs(metadata, elig, audit, analysis)
+        if e02_meta.empty or e02_meta["subject"].nunique() < outer:
             write_json(output_root / "e02" / analysis / "skipped.json", {"reason": "insufficient_subjects"})
             continue
-        m = meta.loc[mask].reset_index(drop=True)
-        Xi = X_e01[mask.to_numpy()]
-        yi = y[mask.to_numpy()]
-        gi = groups[mask.to_numpy()]
+        ep2 = epochs[e02_meta.index.to_numpy()]
+        m = ep2.metadata.reset_index(drop=True)
+        Xi, _ = extract_e01_erd_features(ep2, config.preprocessing)
+        yi = m["label"].to_numpy(dtype=int)
+        gi = m["subject"].to_numpy(dtype=int)
         res = run_nested_group_cv(
             experiment=f"E02_{analysis}",
             model_name="erd_lr",

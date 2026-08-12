@@ -17,13 +17,18 @@ with task window [task_tmin, task_tmax] and baseline [baseline_tmin, baseline_tm
 
 E00 features
 ------------
-Pre-cue run-state log band power on [-2.0, -0.5] s only:
+Pre-cue run-state log band power on a **leakage-safe** interval only:
 
     logBP = log(P_precue + eps)
 
+Under continuous zero-phase FIR filtering (frozen preprocessing), samples in
+``(-half_support, 0]`` can be influenced by cue/post-cue activity. E00 therefore
+uses ``[e00_tmin, e00_tmax]`` with ``e00_tmax = -(half_samples + 1)/sfreq``
+(see ``filter_support`` and ``docs/e00_filter_support_analysis.md``), not the
+historical ``[-2.0, -0.5]`` crop. E01 baseline remains ``[-2.0, -0.5]``.
+
 E00 does **not** use a post-cue interval and does **not** form an ERD ratio
-against the same window. Zero-phase FIR filtering is applied to continuous data
-before epoching; the -0.5 s upper bound leaves a margin before cue onset at 0 s.
+against the same window.
 """
 
 from __future__ import annotations
@@ -34,6 +39,7 @@ import numpy as np
 import scipy
 from mne.time_frequency import psd_array_welch
 
+from eeg_me_mi.filter_support import e00_window_from_preproc, measure_fir_support
 from eeg_me_mi.protocol import SENSORIMOTOR_CHANNELS
 
 # Canonical band edges; 13 Hz belongs to beta only.
@@ -140,19 +146,35 @@ def extract_e01_erd_features(
 def extract_e00_log_bandpower_features(
     epochs, preproc: dict[str, Any], *, channels=SENSORIMOTOR_CHANNELS
 ) -> tuple[np.ndarray, list[str]]:
-    """Pre-cue log band-power features (no post-cue samples)."""
-    tmin = float(preproc["baseline_tmin"])
-    tmax = float(preproc["baseline_tmax"])
-    if tmax > 0:
+    """Leakage-safe pre-cue log band-power features (no cue/post-cue support)."""
+    tmin, tmax = e00_window_from_preproc(preproc)
+    sfreq = float(epochs.info["sfreq"])
+    support = measure_fir_support(
+        sfreq=sfreq,
+        l_freq=float(preproc["l_freq"]),
+        h_freq=float(preproc["h_freq"]),
+    )
+    half = float(support["half_support_sec"])
+    # Require crop entirely outside the theoretical support of an impulse at t=0.
+    if tmax > -half + 1e-12:
+        raise ValueError(
+            f"E00 tmax={tmax} overlaps zero-phase FIR half-support {half:.6f}s; "
+            "refuse potentially leaky window"
+        )
+    if tmax >= 0:
         raise ValueError("E00 window must not include post-cue samples")
+
     data = _crop_data(epochs, tmin, tmax)
     cropped = epochs.copy().crop(tmin=tmin, tmax=tmax)
-    if cropped.times.max() > -0.5 + 1e-9:
-        raise AssertionError("E00 features used samples after -0.5 s")
+    if cropped.times.max() >= -half + 1e-12:
+        raise AssertionError(
+            f"E00 features used samples within FIR half-support of cue "
+            f"(max_t={cropped.times.max()}, half_support={half})"
+        )
     if cropped.times.max() >= 0:
         raise AssertionError("E00 features used post-cue samples")
 
-    powers = band_powers(data, float(epochs.info["sfreq"]))
+    powers = band_powers(data, sfreq)
     eps = np.finfo(float).tiny
     blocks = []
     for band in BANDS:
