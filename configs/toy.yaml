@@ -1,7 +1,9 @@
 schema_version: 1
 run_name: toy
 seed: 2026
-subjects: [1, 2, 3, 4]
+# Early participant IDs for engineering validation (not performance-selected).
+# Eligibility is applied after audit/preprocessing; outer_folds=2 requires >=2 eligible.
+subjects: [1, 2, 3, 4, 5, 6, 7, 8]
 runs: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 paths:
   data_root: data/physionet_eegmmidb
@@ -21,9 +23,11 @@ preprocessing:
 cv:
   outer_folds: 2
   inner_folds: 2
-  scoring: roc_auc
+  scoring: balanced_accuracy
 statistics:
   bootstrap_replicates: 50
-  permutations: 5
-models: [dummy, erd_lr, csp_lda, tangent_lr]
-
+  permutations: 0
+eligibility:
+  min_epochs_per_mode: 30
+logistic_c_grid: [0.01, 0.1, 1.0, 10.0]
+models: [dummy, erd_lr]
