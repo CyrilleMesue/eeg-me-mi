@@ -78,7 +78,7 @@ repaired E01 windows; observed statistic and nulls share the same feature path.
 
 | Item | Value |
 |---|---|
-| Commit | `1de5f6c3720d6a8905d23e5e9172fba510948d84` (retagged after this docs pin) |
+| Commit | `4443f7aea151785a8a6c232f7caa5f5e25165b38` |
 | Execution-candidate tag | `m2-preexec-fir-windows-candidate` |
 | Clean tree | yes |
 | Config checksum (SHA-256) | `6c619f6039964085506c22f38d5b35647afacac1143e122868704f37438f795a` |
