@@ -13,22 +13,24 @@ Baseline-referenced ERD/ERS in dB:
 
     ERD_dB = 10 * log10(P_task / P_baseline)
 
-with task window [task_tmin, task_tmax] and baseline [baseline_tmin, baseline_tmax].
+with FIR-safe windows (80 Hz half-support 0.825 s → ±0.8375 s boundary):
+
+* baseline / reference: ``[baseline_tmin, baseline_tmax] = [-2.0, -0.8375]``
+* task: ``[task_tmin, task_tmax] = [+0.8375, +3.5]``
+
+The cue-adjacent interval ``(-0.8375, +0.8375)`` is excluded from confirmatory
+spectral summaries because zero-phase FIR can smear information across cue onset.
 
 E00 features
 ------------
-Pre-cue run-state log band power on a **leakage-safe** interval only:
+Pre-cue run-state **log band power** (not ERD) on the same safe pre-cue interval:
 
     logBP = log(P_precue + eps)
 
-Under continuous zero-phase FIR filtering (frozen preprocessing), samples in
-``(-half_support, 0]`` can be influenced by cue/post-cue activity. E00 therefore
-uses ``[e00_tmin, e00_tmax]`` with ``e00_tmax = -(half_samples + 1)/sfreq``
-(see ``filter_support`` and ``docs/e00_filter_support_analysis.md``), not the
-historical ``[-2.0, -0.5]`` crop. E01 baseline remains ``[-2.0, -0.5]``.
+with ``[e00_tmin, e00_tmax] = [-2.0, -0.8375]``.
 
-E00 does **not** use a post-cue interval and does **not** form an ERD ratio
-against the same window.
+E00 and E01 therefore share the same safe pre-cue spectral interval; E00 uses
+absolute/log power while E01 uses that interval only as the ERD reference.
 """
 
 from __future__ import annotations
@@ -39,7 +41,12 @@ import numpy as np
 import scipy
 from mne.time_frequency import psd_array_welch
 
-from eeg_me_mi.filter_support import e00_window_from_preproc, measure_fir_support
+from eeg_me_mi.filter_support import (
+    assert_crop_outside_cue_support,
+    e00_window_from_preproc,
+    e01_windows_from_preproc,
+    measure_fir_support,
+)
 from eeg_me_mi.protocol import SENSORIMOTOR_CHANNELS
 
 # Canonical band edges; 13 Hz belongs to beta only.
@@ -113,9 +120,16 @@ def extract_e01_erd_features(
     epochs, preproc: dict[str, Any], *, channels=SENSORIMOTOR_CHANNELS
 ) -> tuple[np.ndarray, list[str]]:
     """Baseline-referenced mu/beta ERD features (default 42-D sensorimotor)."""
-    baseline = _crop_data(epochs, float(preproc["baseline_tmin"]), float(preproc["baseline_tmax"]))
-    task = _crop_data(epochs, float(preproc["task_tmin"]), float(preproc["task_tmax"]))
-    assert float(preproc["baseline_tmax"]) <= float(preproc["task_tmin"])
+    wins = e01_windows_from_preproc(preproc)
+    half = float(wins["half_support_sec"])
+
+    baseline_ep = epochs.copy().crop(tmin=wins["baseline_tmin"], tmax=wins["baseline_tmax"])
+    task_ep = epochs.copy().crop(tmin=wins["task_tmin"], tmax=wins["task_tmax"])
+    assert_crop_outside_cue_support(baseline_ep.times, half_support_sec=half, side="pre")
+    assert_crop_outside_cue_support(task_ep.times, half_support_sec=half, side="post")
+
+    baseline = baseline_ep.get_data(copy=False)
+    task = task_ep.get_data(copy=False)
 
     sfreq = float(epochs.info["sfreq"])
     baseline_power = band_powers(baseline, sfreq)
@@ -166,11 +180,7 @@ def extract_e00_log_bandpower_features(
 
     data = _crop_data(epochs, tmin, tmax)
     cropped = epochs.copy().crop(tmin=tmin, tmax=tmax)
-    if cropped.times.max() >= -half + 1e-12:
-        raise AssertionError(
-            f"E00 features used samples within FIR half-support of cue "
-            f"(max_t={cropped.times.max()}, half_support={half})"
-        )
+    assert_crop_outside_cue_support(cropped.times, half_support_sec=half, side="pre")
     if cropped.times.max() >= 0:
         raise AssertionError("E00 features used post-cue samples")
 
@@ -197,5 +207,10 @@ def extract_e00_log_bandpower_features(
 
 
 def task_window_array(epochs, preproc: dict[str, Any]) -> np.ndarray:
-    """Return (n, ch, time) array for CSP/Riemann on the task window."""
-    return _crop_data(epochs, float(preproc["task_tmin"]), float(preproc["task_tmax"])).astype(np.float64)
+    """Return (n, ch, time) array for CSP/Riemann on the FIR-safe task window."""
+    wins = e01_windows_from_preproc(preproc)
+    task_ep = epochs.copy().crop(tmin=wins["task_tmin"], tmax=wins["task_tmax"])
+    assert_crop_outside_cue_support(
+        task_ep.times, half_support_sec=float(wins["half_support_sec"]), side="post"
+    )
+    return task_ep.get_data(copy=False).astype(np.float64)

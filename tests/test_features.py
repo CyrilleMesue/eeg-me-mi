@@ -22,10 +22,10 @@ PREPROC = {
     "h_freq": 30.0,
     "target_sfreq": 80.0,
     "baseline_tmin": -2.0,
-    "baseline_tmax": -0.5,
+    "baseline_tmax": -0.8375,
     "e00_tmin": -2.0,
     "e00_tmax": -0.8375,
-    "task_tmin": 0.5,
+    "task_tmin": 0.8375,
     "task_tmax": 3.5,
     "epoch_tmin": -2.0,
     "epoch_tmax": 3.5,
@@ -37,7 +37,7 @@ def _make_epochs(n_epochs: int = 4, sfreq: float = 80.0):
     n_times = int(round((PREPROC["epoch_tmax"] - PREPROC["epoch_tmin"]) * sfreq)) + 1
     data = np.random.default_rng(0).normal(scale=1e-5, size=(n_epochs, len(SENSORIMOTOR_CHANNELS), n_times))
     times = PREPROC["epoch_tmin"] + np.arange(n_times) / sfreq
-    task = (times >= 0.5) & (times <= 3.5)
+    task = (times >= 0.8375) & (times <= 3.5)
     for ch in range(len(SENSORIMOTOR_CHANNELS)):
         data[:, ch, task] += 2e-5 * np.sin(2 * np.pi * 10 * times[task])
 
@@ -90,6 +90,18 @@ def test_e00_rejects_postcue_and_leaky_window():
     leaky["e00_tmax"] = -0.5  # historical unsafe crop
     with pytest.raises(ValueError, match="half-support"):
         extract_e00_log_bandpower_features(epochs, leaky)
+
+
+def test_e01_rejects_historical_unsafe_windows():
+    epochs = _make_epochs()
+    bad_base = dict(PREPROC)
+    bad_base["baseline_tmax"] = -0.5
+    with pytest.raises(ValueError, match="baseline_tmax"):
+        extract_e01_erd_features(epochs, bad_base)
+    bad_task = dict(PREPROC)
+    bad_task["task_tmin"] = 0.5
+    with pytest.raises(ValueError, match="task_tmin"):
+        extract_e01_erd_features(epochs, bad_task)
 
 
 def test_e01_windows_separated():

@@ -43,7 +43,7 @@ def _cache_key(preproc: dict[str, Any], channels: Sequence[str], *, mode: str) -
         "phase": "zero",
         "channels": list(channels),
         "mne_version": mne.__version__,
-        "version": 3,
+        "version": 4,
     }
     digest = hashlib.sha256(json.dumps(payload, sort_keys=True).encode("utf-8")).hexdigest()
     return digest[:12]

@@ -73,14 +73,20 @@ Frozen E00 window:
 - **`e00_tmax = −0.8375 s`**
 - Usable length ≈ **1.1625 s** (adequate for Welch mu/beta log-power)
 
-E01 baseline remains `[−2.0, −0.5]` (unchanged). The E00 vs E01 window
-difference is a **control-specific necessity** documented here and in
-`docs/final_analysis_plan.md`.
+E01 baseline / task (amended pre-execution to the same FIR-safe boundaries):
+
+- **baseline / reference:** `[−2.0, −0.8375] s`
+- **task (ERD, CSP, Riemann):** `[+0.8375, +3.5] s`
+- **excluded cue-adjacent:** `(−0.8375, +0.8375) s`
+
+E00 and the E01 reference therefore share the same safe pre-cue interval.
+E00 remains absolute/log band power (not ERD).
 
 ## Impulse-test requirement
 
 Synthetic continuous data with a large impulse at/after cue onset, filtered with
 the real MNE zero-phase FIR, then epoched and passed through
-`extract_e00_log_bandpower_features`, must show negligible E00 feature change
-under the safe window. The historical `e00_tmax = −0.5` setting must be rejected
-by the extractor. Implemented in `tests/test_remediation.py`.
+`extract_e00_log_bandpower_features` / `extract_e01_erd_features`, must show
+negligible influence on safe pre-cue windows. Historical `tmax = −0.5` /
+`task_tmin = +0.5` settings must be rejected. Implemented in
+`tests/test_remediation.py`.

@@ -165,7 +165,7 @@ def build_cache_manifest(
 ) -> dict[str, Any]:
     """Rich cache identity for scientifically incompatible reuse prevention."""
     manifest = {
-        "version": 3,
+        "version": 4,
         "subject": int(subject),
         "runs": list(map(int, runs)),
         "mode": mode,

@@ -16,8 +16,10 @@ preprocessing:
   epoch_tmin: -2.0
   epoch_tmax: 3.5
   baseline_tmin: -2.0
-  baseline_tmax: -0.5
-  task_tmin: 0.5
+  baseline_tmax: -0.8375
+  e00_tmin: -2.0
+  e00_tmax: -0.8375
+  task_tmin: 0.8375
   task_tmax: 3.5
   reject_peak_to_peak_uv: 200.0
 cv:

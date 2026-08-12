@@ -95,15 +95,11 @@ construction; this is not a silent rule change.
 - Primary sensorimotor set: FC5/3/1/z/2/4/6, C5/3/1/z/2/4/6,
   CP5/3/1/z/2/4/6 (21 channels).
 - Epoch: -2.0 to 3.5 s around T1/T2.
-- Measured FIR half-support (80 Hz, 133 taps): **0.825 s**; safe boundary **±0.8375 s**.
-- Cue-adjacent interval `(-0.8375, +0.8375)` is **excluded** from confirmatory
-  spectral summaries (zero-phase FIR can smear across cue onset).
-- E00 pre-cue run-state window: **[-2.0, -0.8375] s** (log mu/beta power; not ERD).
-- E01 ERD baseline/reference: **[-2.0, -0.8375] s** (same safe pre-cue interval as E00).
-- E01 task window (also CSP/Riemann): **[+0.8375, +3.5] s**.
-- This supersedes historical `[-2.0, -0.5]` / `[+0.5, +3.5]` and was amended
-  **before definitive execution**, justified solely from measured filter support
-  (see `docs/e00_filter_support_analysis.md`).
+- Baseline (E01): -2.0 to -0.5 s.
+- E00 leakage-safe window: -2.0 to -0.8375 s (FIR half-support 0.825 s at 80 Hz;
+  see `docs/e00_filter_support_analysis.md`). Historical -2.0…-0.5 was unsafe under
+  zero-phase filtering.
+- Task interval: 0.5 to 3.5 s.
 - Primary gross-artifact screen: 200 µV peak-to-peak.
 - Mandatory artifact sensitivities: 150 µV and no amplitude rejection.
 - Participant-level caches; shared minimally processed caches support threshold
@@ -152,10 +148,9 @@ does not resolve fixed order or movement-artifact confounding.
 Mandatory negative/control analysis. Terminology: **pre-cue run-state decoding
 control**. Do **not** describe E00 as a biologically neutral baseline.
 
-- Window: −2.0 to −0.8375 s (same FIR-safe pre-cue interval as the E01 reference).
-  Shared continuous zero-phase preprocessing retained. E00 remains absolute/log
-  band power (not ERD). Using the identical safe pre-cue interval for E00 power
-  and E01 reference is an advantage of the repaired design.
+- Window: −2.0 to −0.8375 s (leakage-safe; no samples within FIR half-support of cue).
+  Shared continuous zero-phase preprocessing retained; E00 crop differs from E01
+  baseline as a control-specific necessity.
 - Features: 42 pre-cue log band-power features (mu/beta × 21 channels).
 - Same eligible epochs/participants/outer folds/inner structure/scaler/LR/C
   grid/metrics/participant aggregation as E01 wherever scientifically applicable.
@@ -307,20 +302,3 @@ Percentile ranges of participant effects are **distributional summaries**, not
 confidence intervals for the mean. Mean participant effects use participant-level
 bootstrap CIs. FDR is applied separately within the ROI-level family and within
 the channel-level exploratory family.
-
-
-## Temporal-support amendment (pre-execution)
-
-Prior to definitive execution, confirmatory spectral windows were aligned to the
-measured zero-phase FIR half-support (0.825 s at 80 Hz; safe boundary ±0.8375 s):
-
-| Window | Interval |
-|---|---|
-| E00 pre-cue log-power | [-2.0, -0.8375] s |
-| E01 ERD baseline | [-2.0, -0.8375] s |
-| E01 / CSP / Riemann task | [+0.8375, +3.5] s |
-| Excluded cue-adjacent | (-0.8375, +0.8375) s |
-
-Amendment basis: filter impulse support only. Not informed by classification
-performance. Historical [-2,-0.5] and [0.5,3.5] windows are superseded and must
-be rejected by the feature extractors.

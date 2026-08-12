@@ -117,8 +117,11 @@ def validate_definitive_config(config: AnalysisConfig) -> None:
     for key in ("l_freq", "h_freq", "target_sfreq", "epoch_tmin", "epoch_tmax", "reject_peak_to_peak_uv"):
         if key not in pre:
             raise ValueError(f"Missing preprocessing field: {key}")
-    # Ensure leakage-safe E00 window is resolvable.
+    # Ensure leakage-safe E00/E01 windows are resolvable and FIR-safe.
+    from eeg_me_mi.filter_support import e00_window_from_preproc, e01_windows_from_preproc
+
     e00_window_from_preproc(pre)
+    e01_windows_from_preproc(pre)
     if list(config.logistic_c_grid) != [0.01, 0.1, 1.0, 10.0]:
         raise ValueError(f"Frozen C grid required; got {config.logistic_c_grid}")
 

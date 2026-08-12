@@ -24,10 +24,12 @@ from eeg_me_mi.eligibility import (
     filter_e02_epochs,
     filter_eligible_epochs,
 )
-from eeg_me_mi.features import extract_e00_log_bandpower_features
+from eeg_me_mi.features import extract_e00_log_bandpower_features, extract_e01_erd_features, task_window_array
 from eeg_me_mi.filter_support import (
     e00_window_from_preproc,
+    e01_windows_from_preproc,
     leakage_safe_e00_tmax,
+    leakage_safe_task_tmin,
     measure_fir_support,
 )
 from eeg_me_mi.models import logistic_param_grid, make_erd_lr_pipeline
@@ -46,10 +48,10 @@ PREPROC = {
     "h_freq": 30.0,
     "target_sfreq": 80.0,
     "baseline_tmin": -2.0,
-    "baseline_tmax": -0.5,
+    "baseline_tmax": -0.8375,
     "e00_tmin": -2.0,
     "e00_tmax": -0.8375,
-    "task_tmin": 0.5,
+    "task_tmin": 0.8375,
     "task_tmax": 3.5,
     "epoch_tmin": -2.0,
     "epoch_tmax": 3.5,
@@ -61,9 +63,120 @@ def test_fir_support_at_target_sfreq():
     assert support["fir_length_samples"] == 133
     assert abs(support["half_support_sec"] - 0.825) < 1e-9
     tmax = leakage_safe_e00_tmax(80.0, support["half_support_sec"])
+    tmin = leakage_safe_task_tmin(80.0, support["half_support_sec"])
     assert abs(tmax - (-0.8375)) < 1e-12
-    # Historical -0.5 window overlaps support
+    assert abs(tmin - 0.8375) < 1e-12
+    # Historical windows overlap support
     assert -0.5 > -support["half_support_sec"]
+    assert 0.5 < support["half_support_sec"]
+    # Exact 80 Hz sample indices: ±67 samples from cue
+    assert abs((-67) / 80.0 - (-0.8375)) < 1e-12
+    assert abs(67 / 80.0 - 0.8375) < 1e-12
+
+
+def _continuous_filtered_epochs(*, impulse_at_rel: float | None, impulse_amp: float = 5e-3):
+    """Build epochs from continuous zero-phase FIR path with optional impulse."""
+    sfreq = 80.0
+    n_ch = len(SENSORIMOTOR_CHANNELS)
+    duration = 10.0
+    n_times = int(duration * sfreq)
+    cue_sample = int(5.0 * sfreq)
+    base = np.random.default_rng(0).normal(scale=1e-6, size=(n_ch, n_times))
+    data = base.copy()
+    if impulse_at_rel is not None:
+        idx = cue_sample + int(round(impulse_at_rel * sfreq))
+        data[:, idx] += impulse_amp
+    info = create_info(list(SENSORIMOTOR_CHANNELS), sfreq=sfreq, ch_types="eeg")
+    raw = mne.io.RawArray(data, info, verbose=False)
+    raw.filter(
+        8.0,
+        30.0,
+        picks="eeg",
+        method="fir",
+        phase="zero",
+        fir_design="firwin",
+        fir_window="hamming",
+        filter_length="auto",
+        verbose=False,
+    )
+    events = np.array([[cue_sample, 0, 1]])
+    return mne.Epochs(
+        raw,
+        events,
+        event_id={"cue": 1},
+        tmin=-2.0,
+        tmax=3.5,
+        baseline=None,
+        preload=True,
+        reject=None,
+        verbose=False,
+    )
+
+
+def test_e01_baseline_immune_to_postcue_impulse():
+    ep_q = _continuous_filtered_epochs(impulse_at_rel=None)
+    ep_i = _continuous_filtered_epochs(impulse_at_rel=0.0)
+    Xq, _ = extract_e01_erd_features(ep_q, PREPROC)
+    Xi, _ = extract_e01_erd_features(ep_i, PREPROC)
+    # Baseline contribution: compare using absolute logBP on baseline window via E00 path
+    Bq, _ = extract_e00_log_bandpower_features(ep_q, PREPROC)
+    Bi, _ = extract_e00_log_bandpower_features(ep_i, PREPROC)
+    scale = np.max(np.abs(Bq)) + 1e-12
+    assert np.max(np.abs(Bi - Bq)) / scale < 1e-10
+    # Full ERD also stable on baseline-driven change (task also affected by impulse;
+    # check baseline crop time domain)
+    times = ep_i.times
+    safe = times <= -0.8375 + 1e-12
+    assert np.max(np.abs(ep_i.get_data()[0][:, safe] - ep_q.get_data()[0][:, safe])) < 1e-6
+    unsafe = dict(PREPROC)
+    unsafe["baseline_tmax"] = -0.5
+    with pytest.raises(ValueError, match="baseline_tmax"):
+        extract_e01_erd_features(ep_i, unsafe)
+
+
+def test_e01_task_immune_to_precue_support_impulse():
+    """Impulse before cue but inside FIR support must not affect task window ≥ +0.8375."""
+    # Place impulse at t=-0.2 s (inside ±0.825 support of cue, and of task samples near +0.5)
+    ep_q = _continuous_filtered_epochs(impulse_at_rel=None)
+    ep_i = _continuous_filtered_epochs(impulse_at_rel=-0.2)
+    times = ep_i.times
+    safe_task = times >= 0.8375 - 1e-12
+    leak_old = (times >= 0.5) & (times < 0.8375)
+    di = ep_i.get_data()[0]
+    dq = ep_q.get_data()[0]
+    assert np.max(np.abs(di[:, leak_old] - dq[:, leak_old])) > 1e-6
+    assert np.max(np.abs(di[:, safe_task] - dq[:, safe_task])) < 1e-6
+    # Feature-level: CSP/task array and ERD task window
+    Tq = task_window_array(ep_q, PREPROC)
+    Ti = task_window_array(ep_i, PREPROC)
+    assert np.max(np.abs(Ti - Tq)) < 1e-6
+    unsafe = dict(PREPROC)
+    unsafe["task_tmin"] = 0.5
+    with pytest.raises(ValueError, match="task_tmin"):
+        extract_e01_erd_features(ep_i, unsafe)
+    with pytest.raises(ValueError, match="task_tmin"):
+        task_window_array(ep_i, unsafe)
+
+
+def test_fir_safe_boundary_sample_indices_at_80hz():
+    """Confirm ±0.8375 maps to sample indices outside half-support (±66)."""
+    sfreq = 80.0
+    half_samples = 66
+    # Boundary sample still in support: ±66 → ±0.825
+    assert half_samples / sfreq == 0.825
+    # Safe inclusive crop endpoints: ±67 → ±0.8375
+    assert (half_samples + 1) / sfreq == 0.8375
+    ep = _continuous_filtered_epochs(impulse_at_rel=None)
+    base = ep.copy().crop(tmin=-2.0, tmax=-0.8375)
+    task = ep.copy().crop(tmin=0.8375, tmax=3.5)
+    assert abs(base.times.max() - (-0.8375)) < 1e-12
+    assert abs(task.times.min() - 0.8375) < 1e-12
+    # Must not include ±0.825
+    assert base.times.max() < -0.825
+    assert task.times.min() > 0.825
+    wins = e01_windows_from_preproc(PREPROC)
+    assert wins["baseline_tmax"] == -0.8375
+    assert wins["task_tmin"] == 0.8375
 
 
 def test_e00_impulse_leakage_real_path():
@@ -554,6 +667,10 @@ def test_definitive_config_accepts_full():
     tmin, tmax = e00_window_from_preproc(cfg.preprocessing)
     assert tmin == -2.0
     assert abs(tmax - (-0.8375)) < 1e-12
+    wins = e01_windows_from_preproc(cfg.preprocessing)
+    assert abs(wins["baseline_tmax"] - (-0.8375)) < 1e-12
+    assert abs(wins["task_tmin"] - 0.8375) < 1e-12
+    assert cfg.preprocessing["baseline_tmax"] == cfg.preprocessing["e00_tmax"]
 
 
 def test_full_and_truba_scientific_params_match():

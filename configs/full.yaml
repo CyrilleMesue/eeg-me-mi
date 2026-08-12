@@ -13,13 +13,13 @@ preprocessing:
   target_sfreq: 80.0
   epoch_tmin: -2.0
   epoch_tmax: 3.5
+  # FIR half-support at 80 Hz = 0.825 s; safe boundary = ±0.8375 s.
+  # Cue-adjacent (-0.8375, +0.8375) excluded from confirmatory spectral windows.
   baseline_tmin: -2.0
-  baseline_tmax: -0.5
-  # Leakage-safe E00 window (derived from FIR half-support 0.825 s at 80 Hz):
-  # tmax = -(66+1)/80 = -0.8375 s. Shared continuous zero-phase preprocessing retained.
+  baseline_tmax: -0.8375
   e00_tmin: -2.0
   e00_tmax: -0.8375
-  task_tmin: 0.5
+  task_tmin: 0.8375
   task_tmax: 3.5
   reject_peak_to_peak_uv: 200.0
 cv:

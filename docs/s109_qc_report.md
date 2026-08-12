@@ -49,17 +49,14 @@ screen; S109 is an order of magnitude more extreme on the worst channel.
 systematic unit/preprocessing bug requiring global cohort recomputation was
 found.
 
-## Proposed rule (NOT implemented — scientific review required)
+## Primary decision (frozen pre-execution)
 
-A *possible* future sensitivity rule (for review only):
+**S109 remains excluded** under the prespecified 200 µV whole-epoch PTP rule.
 
-> If a participant fails the primary PTP screen solely because a single named
-> channel exceeds threshold on essentially all epochs, while the remaining
-> sensorimotor channels would retain epochs under the same threshold, flag for
-> optional single-channel rejection sensitivity.
-
-**This rule is not adopted.** Implementing it would change eligibility and
-requires explicit scientific approval (STOP condition #6).
+- No C4 / single-channel rescue rule is implemented.
+- No change to the primary bad-channel / artifact procedure.
+- Any future general bad-channel sensitivity analysis would be exploratory only
+  and must not alter the confirmatory cohort retrospectively.
 
 ## Machine-readable tables
 
