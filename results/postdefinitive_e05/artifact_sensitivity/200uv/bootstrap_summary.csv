@@ -1,0 +1,2 @@
+metric,mean,bootstrap_mean,ci_low,ci_high,n_bootstrap,n_participants
+balanced_accuracy,0.6179239767273408,0.6179414205096119,0.6035525544008872,0.632899080752947,2000,102

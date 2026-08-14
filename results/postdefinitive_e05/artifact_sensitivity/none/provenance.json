@@ -1,0 +1,52 @@
+{
+  "parent_definitive_tag": "m2-preexec-fir-windows-candidate",
+  "reason": "Completion of analyses prespecified before definitive outcome inspection but absent from the definitive output package.",
+  "windows": {
+    "baseline_tmin": -2.0,
+    "baseline_tmax": -0.8375,
+    "task_tmin": 0.8375,
+    "task_tmax": 3.5,
+    "half_support_sec": 0.825,
+    "safe_boundary_sec": 0.8375
+  },
+  "e00_window": [
+    -2.0,
+    -0.8375
+  ],
+  "channels": [
+    "FC5",
+    "FC3",
+    "FC1",
+    "FCz",
+    "FC2",
+    "FC4",
+    "FC6",
+    "C5",
+    "C3",
+    "C1",
+    "Cz",
+    "C2",
+    "C4",
+    "C6",
+    "CP5",
+    "CP3",
+    "CP1",
+    "CPz",
+    "CP2",
+    "CP4",
+    "CP6"
+  ],
+  "elapsed_sec": 208.05116438493133,
+  "git_commit": "3b615ed1a8e455918d6e9d90bfb5c4e42ae44adc",
+  "git_tag": "m2-preexec-fir-windows-candidate",
+  "git_dirty": true,
+  "software_versions": {
+    "python": "3.13.11",
+    "platform": "Linux-5.14.0-284.30.1.el9_2.x86_64-x86_64-with-glibc2.34",
+    "mne": "1.12.1",
+    "numpy": "2.5.2",
+    "pandas": "2.3.3",
+    "scipy": "1.18.0",
+    "scikit_learn": "1.9.0"
+  }
+}

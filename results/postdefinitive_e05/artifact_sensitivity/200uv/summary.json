@@ -1,0 +1,13 @@
+{
+  "balanced_accuracy": 0.6179239767273408,
+  "roc_auc": 0.6703521833725042,
+  "macro_f1": 0.6086384039896108,
+  "sensitivity": 0.6141819287426921,
+  "specificity": 0.6216660247119895,
+  "average_precision": 0.6682401695115144,
+  "mcc": 0.24246123137191264,
+  "accuracy": 0.6172957222781185,
+  "n_participants": 102.0,
+  "experiment": "E05_200uv",
+  "model": "erd_lr"
+}

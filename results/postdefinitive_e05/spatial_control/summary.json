@@ -1,0 +1,13 @@
+{
+  "balanced_accuracy": 0.583814977287951,
+  "roc_auc": 0.6206565707898914,
+  "macro_f1": 0.5761826679872593,
+  "sensitivity": 0.5830978435504659,
+  "specificity": 0.5845321110254357,
+  "average_precision": 0.6181251079729878,
+  "mcc": 0.17117946817161442,
+  "accuracy": 0.5816169869350142,
+  "n_participants": 78.0,
+  "experiment": "E05_spatial_control",
+  "model": "erd_lr"
+}

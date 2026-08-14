@@ -1,0 +1,84 @@
+{
+  "thresholds": {
+    "none": {
+      "balanced_accuracy": 0.6185680325505829,
+      "n_subjects": 109,
+      "n_epochs": 19425,
+      "summary": {
+        "balanced_accuracy": 0.6185680325505829,
+        "roc_auc": 0.6729366092428191,
+        "macro_f1": 0.6103734819581293,
+        "sensitivity": 0.6105323477460841,
+        "specificity": 0.6266037173550816,
+        "average_precision": 0.6739947839401685,
+        "mcc": 0.24493868062002333,
+        "accuracy": 0.6187040977638631,
+        "n_participants": 109.0,
+        "experiment": "E05_none",
+        "model": "erd_lr"
+      },
+      "reused_existing": true
+    },
+    "150uv": {
+      "balanced_accuracy": 0.6168866326577104,
+      "n_subjects": 94,
+      "n_epochs": 14650,
+      "summary": {
+        "balanced_accuracy": 0.6168866326577104,
+        "roc_auc": 0.6685928466606532,
+        "macro_f1": 0.6065566879559352,
+        "sensitivity": 0.6103965968250963,
+        "specificity": 0.6233766684903246,
+        "average_precision": 0.6718304911004079,
+        "mcc": 0.24061211334610985,
+        "accuracy": 0.6147718262439685,
+        "n_participants": 94.0,
+        "experiment": "E05_150uv",
+        "model": "erd_lr"
+      },
+      "reused_existing": true
+    },
+    "200uv": {
+      "balanced_accuracy": 0.6179239767273408,
+      "n_subjects": 102,
+      "n_epochs": 16913,
+      "summary": {
+        "balanced_accuracy": 0.6179239767273408,
+        "roc_auc": 0.6703521833725042,
+        "macro_f1": 0.6086384039896108,
+        "sensitivity": 0.6141819287426921,
+        "specificity": 0.6216660247119895,
+        "average_precision": 0.6682401695115144,
+        "mcc": 0.24246123137191264,
+        "accuracy": 0.6172957222781185,
+        "n_participants": 102.0,
+        "experiment": "E05_200uv",
+        "model": "erd_lr"
+      },
+      "reused_existing": true
+    }
+  },
+  "spatial": {
+    "spatial_summary": {
+      "balanced_accuracy": 0.583814977287951,
+      "roc_auc": 0.6206565707898914,
+      "macro_f1": 0.5761826679872593,
+      "sensitivity": 0.5830978435504659,
+      "specificity": 0.5845321110254357,
+      "average_precision": 0.6181251079729878,
+      "mcc": 0.17117946817161442,
+      "accuracy": 0.5816169869350142,
+      "n_participants": 78.0,
+      "experiment": "E05_spatial_control",
+      "model": "erd_lr"
+    },
+    "paired": {
+      "common_n": 77,
+      "mean_difference_sm_minus_sc": 0.03823465807166761,
+      "bootstrap_ci_low": 0.024501420254655796,
+      "bootstrap_ci_high": 0.052141517857346616,
+      "formal_paired_p_prespecified": false,
+      "note": "Effect + participant bootstrap CI only; no post-hoc confirmatory p-value."
+    }
+  }
+}

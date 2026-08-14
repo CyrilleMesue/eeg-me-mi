@@ -1,0 +1,6 @@
+{
+  "roi_level": "FDR within ROI\u00d7band tests",
+  "channel_level": "separate FDR within channel\u00d7band exploratory tests",
+  "percentile_columns": "participant_effect distribution, not CI for the mean",
+  "mean_bootstrap_ci": "participant-level bootstrap CI for mean effect"
+}

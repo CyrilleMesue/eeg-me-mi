@@ -340,6 +340,11 @@ def process_subject(
     return None, logs
 
 
+# Sentinel: omit threshold_uv → use config reject_peak_to_peak_uv.
+# Explicit None → no amplitude rejection (E05 "none").
+_THRESHOLD_DEFAULT = object()
+
+
 def build_epoch_dataset(
     subjects: tuple[int, ...],
     runs: tuple[int, ...],
@@ -351,9 +356,17 @@ def build_epoch_dataset(
     force: bool = False,
     channels: Sequence[str] = SENSORIMOTOR_CHANNELS,
     mode: str = "rejected",
-    threshold_uv: float | None = None,
+    threshold_uv: float | None | object = _THRESHOLD_DEFAULT,
 ) -> tuple[mne.Epochs | None, pd.DataFrame]:
-    """Process subjects one-by-one; never keep all raw EDFs in memory."""
+    """Process subjects one-by-one; never keep all raw EDFs in memory.
+
+    For ``mode="minimal"``, peak-to-peak filtering is applied after loading the
+    shared unrejected cache:
+
+    - omit ``threshold_uv`` → use ``preproc['reject_peak_to_peak_uv']``;
+    - ``threshold_uv=None`` → keep all epochs (true no-rejection);
+    - numeric threshold → retain epochs with ``ptp_uv <= threshold``.
+    """
     retained: list[mne.Epochs] = []
     all_logs: list[dict[str, Any]] = []
 
@@ -372,7 +385,10 @@ def build_epoch_dataset(
         all_logs.extend(logs)
         if epochs is not None and len(epochs):
             if mode == "minimal":
-                thr = threshold_uv if threshold_uv is not None else preproc.get("reject_peak_to_peak_uv")
+                if threshold_uv is _THRESHOLD_DEFAULT:
+                    thr = preproc.get("reject_peak_to_peak_uv")
+                else:
+                    thr = threshold_uv  # None => no rejection
                 epochs = apply_ptp_threshold(epochs, thr)
             if len(epochs):
                 retained.append(epochs)

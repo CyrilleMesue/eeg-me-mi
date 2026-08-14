@@ -1,0 +1,16 @@
+{
+  "task": "postdefinitive_e05_controls",
+  "reason": "Completion of analyses prespecified before definitive outcome inspection but absent from the definitive output package.",
+  "parent_definitive_tag": "m2-preexec-fir-windows-candidate",
+  "parent_definitive_commit": "3b615ed1a8e455918d6e9d90bfb5c4e42ae44adc",
+  "truba_jobs": {
+    "artifact_sensitivity": 6240549,
+    "spatial_completion": 6242944
+  },
+  "immutable_definitive_tree": "results/definitive/",
+  "outputs_root": "results/postdefinitive_e05/",
+  "review_extractions_root": "results/postdefinitive_review/",
+  "suggested_tag": "postdefinitive-e05-controls",
+  "primary_e01_e07_changed": false,
+  "reproduction_200uv_match": true
+}

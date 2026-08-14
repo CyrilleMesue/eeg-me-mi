@@ -1,0 +1,8 @@
+{
+  "common_n": 77,
+  "mean_difference_sm_minus_sc": 0.03823465807166761,
+  "bootstrap_ci_low": 0.024501420254655796,
+  "bootstrap_ci_high": 0.052141517857346616,
+  "formal_paired_p_prespecified": false,
+  "note": "Effect + participant bootstrap CI only; no post-hoc confirmatory p-value."
+}

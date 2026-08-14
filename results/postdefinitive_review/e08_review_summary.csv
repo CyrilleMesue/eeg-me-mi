@@ -1,0 +1,4 @@
+table,n_rows,columns
+by_run,12,run|condition|task_family|repetition|n_epochs|precue_mu_mean|precue_beta_mean|ptp_mean
+by_repetition,12,condition|task_family|repetition|n_epochs|precue_mu_mean|precue_beta_mean|ptp_mean
+matched_pairs,6,pair_id|me_run|mi_run|n_me|n_mi|precue_mu_me|precue_mu_mi|precue_beta_me|precue_beta_mi|ptp_me|ptp_mi

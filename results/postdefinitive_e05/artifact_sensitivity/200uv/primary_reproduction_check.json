@@ -1,0 +1,11 @@
+{
+  "frozen_e01_bacc": 0.6179239767,
+  "e05_200uv_bacc": 0.6179239767273408,
+  "abs_delta": 2.7340796293628955e-11,
+  "n_epochs": 16913,
+  "expected_200uv_epochs": 16913,
+  "epoch_count_match": true,
+  "tolerance": 1e-10,
+  "match": true,
+  "note": "expected_200uv_epochs is post-eligibility E01 OOF length (16913), not pre-eligibility PTP-retained count (17257)."
+}
