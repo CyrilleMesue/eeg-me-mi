@@ -1,0 +1,9 @@
+metric,value,role
+BAcc (primary),0.6179239767273408,primary
+ROC-AUC,0.6703521833725042,secondary
+Macro-F1,0.6086384039896108,secondary
+Sensitivity,0.6141819287426921,secondary
+Specificity,0.6216660247119895,secondary
+Average precision,0.6682401695115144,secondary
+MCC,0.24246123137191264,secondary
+Accuracy,0.6172957222781185,secondary
