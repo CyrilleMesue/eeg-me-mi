@@ -17,7 +17,8 @@ CI definition (unless noted): participant-bootstrap 95% percentile interval from
 | 4 | A | `e03/roi_summary.csv` | mean, CI, reject_fdr | 102 | Forest | FDR as frozen |
 | 4 | B | `e03/channel_summary_fdr.csv` + MNE `standard_1005` layout | channel mean | — | Topomap | Supporting |
 | 4 | C | `postdefinitive_e05/spatial_control/*` | SM/SC BAcc; paired Δ | 78 / 77 | Paired distributions | Descriptive (no confirmatory p) |
-| 4 | D | E05 artifact + `postdefinitive_review/sensitivity_summary.csv` + sampling-rate JSON; `e08_matched_pairs.csv` | BAcc; pre-cue β | varies | Forest + paired bars | Diagnostic |
+| 5 | A | E05 artifact + `postdefinitive_review/sensitivity_summary.csv` + sampling-rate JSON | BAcc, CI, N | varies | Forest | Descriptive |
+| 5 | B | `e08_matched_pairs.csv` | pre-cue β (µV² display) | pairs | Grouped bars | Diagnostic |
 | S1 | — | `qc/participant_eligibility.csv` | eligible counts | — | Flow | Descriptive |
 | S2 | — | `e01/erd_lr/summary.json` | secondary metrics | 102 | Table | Descriptive |
 | S3 | — | `e02/*/…` | BAcc | per movement | Distributions | Descriptive |

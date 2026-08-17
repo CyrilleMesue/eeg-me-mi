@@ -12,7 +12,7 @@
 
 | Issue in V1 | V2 change |
 |---|---|
-| 5 main figures; overloaded | **4 main figures** with clearer evidence chain |
+| 5 main figures; overloaded | **4→5 main after split:** Figs 1–3 approved; crowded Fig 4 split into Fig 4 (physiology/spatial) + Fig 5 (robustness/protocol) |
 | Paragraphs / “report” text inside panels | Minimal annotations; detail moved to captions |
 | Many bar charts | Prefer violins, forests, permutation hist, topomaps, paired Δ |
 | Secondary metrics in main Fig 2D | Moved to S2 / Table 2 recommendation |
@@ -52,17 +52,22 @@
 
 ---
 
-## Figure 4 — Physiology + spatial + robustness + protocol state
+## Figure 4 — Physiology and spatial evidence
 
-**What was wrong in V1:** Fig 4 (5 panels) + Fig 5 (5 panels) fragmented; bars for spatial control; crowded.  
-**What changed:** 2×2 synthesis — ROI forest, topomaps, paired spatial distributions + Δ inset, robustness forest + E08 pre-cue β (µV²).  
-**Why clearer:** Interpretation evidence chain in one figure; paired spatial story; robustness near-identity visible as forest.  
-**Sources:** E03 ROI/channel; E05 spatial; artifact + sensitivity + sampling-rate; E08 matched pairs.  
-**Unresolved:**
-1. Panel D is dense (two subcomponents); may need journal-specific splitting if column width requires.
-2. Topomap color scale includes unused positive range (symmetric diverging scale by design).
-3. Band colors (μ/β) vs condition colors (ME/MI) are now distinct Okabe–Ito hues, but still require caption legend clarity.
-4. Spatial inset may crowd small print sizes — verify at 175 mm width.
+**What was wrong in V1 / early V2:** Combined physiology + robustness into one overcrowded figure.  
+**What changed (post-approval split):** Kept former panels A–C only — ROI forest, topomaps, paired spatial control. Panel C spans full width. Figures 1–3 unchanged.  
+**Why clearer:** Physiology/spatial interpretation can breathe without competing with sensitivity/E08.  
+**Sources:** E03 ROI/channel; E05 spatial paired.  
+**Unresolved:** Topomap symmetric colorbar; spatial inset density at single-column size.
+
+---
+
+## Figure 5 — Robustness and protocol state
+
+**What changed:** Former Figure 4 panel D promoted to its own figure with panels A (sensitivity forest) and B (E08 pre-cue β diagnostic), same visual style.  
+**Why clearer:** Removes the main density complaint from V2 Figure 4.  
+**Sources:** Artifact/sensitivity/sampling-rate frozen tables; E08 matched pairs (β as µV² via exact V²×1e12).  
+**Unresolved:** None blocking; confirm side-by-side layout at final column width.
 
 ---
 

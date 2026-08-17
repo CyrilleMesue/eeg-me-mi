@@ -76,7 +76,7 @@ def main() -> int:
         "150uv": 0.616887,
         "200uv": 0.617924,
     }
-    rob = pd.read_csv(SRC / "Figure_4D_robustness_source.csv")
+    rob = pd.read_csv(SRC / "Figure_5A_robustness_source.csv")
     for key, approx in thr.items():
         label = {"none": "No rejection", "150uv": "150 µV", "200uv": "200 µV"}[key]
         row = rob.loc[rob.analysis == label].iloc[0]
@@ -99,7 +99,8 @@ def main() -> int:
         "figures_v2/main/Figure_1_Design_Safeguards.pdf",
         "figures_v2/main/Figure_2_Primary_Decoding.pdf",
         "figures_v2/main/Figure_3_PreCue_PostCue.pdf",
-        "figures_v2/main/Figure_4_Physiology_Robustness.pdf",
+        "figures_v2/main/Figure_4_Physiology_Spatial.pdf",
+        "figures_v2/main/Figure_5_Robustness_Protocol.pdf",
         "figures_v2/previews/publication_figures_v2_contact_sheet.pdf",
     ]
     for rel in required:

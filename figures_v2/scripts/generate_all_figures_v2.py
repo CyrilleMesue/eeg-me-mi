@@ -362,21 +362,12 @@ def figure_3() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Figure 4 — Interpretation and robustness (2×2)
+# Figure 4 — Physiology and spatial (former Fig4 A–C)
+# Figure 5 — Robustness and protocol state (former Fig4 D)
 # ---------------------------------------------------------------------------
 
 
-def figure_4() -> None:
-    from eeg_me_mi.protocol import SENSORIMOTOR_CHANNELS
-
-    roi = pd.read_csv(E03 / "roi_summary.csv")
-    ch = pd.read_csv(E03 / "channel_summary_fdr.csv")
-    spat = load_json(E05 / "spatial_control/paired_effect_summary.json")
-    spat_boot = pd.read_csv(E05 / "spatial_control/bootstrap_summary.csv")
-    spat_boot_row = spat_boot.loc[spat_boot["metric"] == "balanced_accuracy"].iloc[0] if "metric" in spat_boot.columns else spat_boot.iloc[0]
-    paired = pd.read_csv(E05 / "spatial_control/paired_participant_differences.csv")
-
-    # robustness rows from frozen sources
+def _robustness_table() -> tuple[pd.DataFrame, float]:
     rob_rows = []
     prim_m, prim_lo, prim_hi = boot_ci(E01 / "erd_lr/bootstrap_summary.csv")
     rob_rows.append({"analysis": "Primary", "n": 102, "bacc": prim_m, "ci_low": prim_lo, "ci_high": prim_hi})
@@ -410,18 +401,27 @@ def figure_4() -> None:
             "ci_high": samp["sensitivity_ci"][1],
         }
     )
-    rob = pd.DataFrame(rob_rows)
+    return pd.DataFrame(rob_rows), prim_m
 
-    pairs = pd.read_csv(REV / "e08_matched_pairs.csv").copy()
-    pairs["precue_beta_me_uv2"] = pairs["precue_beta_me"] * V2_TO_UV2
-    pairs["precue_beta_mi_uv2"] = pairs["precue_beta_mi"] * V2_TO_UV2
-    pairs["delta_beta_uv2"] = pairs["precue_beta_me_uv2"] - pairs["precue_beta_mi_uv2"]
+
+def figure_4() -> None:
+    """Physiology + spatial (V2 Fig4 panels A–C, preserved style)."""
+    from eeg_me_mi.protocol import SENSORIMOTOR_CHANNELS
+
+    roi = pd.read_csv(E03 / "roi_summary.csv")
+    ch = pd.read_csv(E03 / "channel_summary_fdr.csv")
+    spat = load_json(E05 / "spatial_control/paired_effect_summary.json")
+    spat_boot = pd.read_csv(E05 / "spatial_control/bootstrap_summary.csv")
+    spat_boot_row = (
+        spat_boot.loc[spat_boot["metric"] == "balanced_accuracy"].iloc[0]
+        if "metric" in spat_boot.columns
+        else spat_boot.iloc[0]
+    )
+    paired = pd.read_csv(E05 / "spatial_control/paired_participant_differences.csv")
 
     export_csv("Figure_4A_source.csv", roi)
     export_csv("Figure_4B_source.csv", ch[["band", "channel", "mean", "p_fdr", "reject_fdr"]])
     export_csv("Figure_4C_source.csv", paired)
-    export_csv("Figure_4D_robustness_source.csv", rob)
-    export_csv("Figure_4D_e08_source.csv", pairs)
     export_json(
         "Figure_4_annotations.json",
         {
@@ -432,12 +432,11 @@ def figure_4() -> None:
             "mean_sm_minus_sc": spat["mean_difference_sm_minus_sc"],
             "paired_ci": [spat["bootstrap_ci_low"], spat["bootstrap_ci_high"]],
             "formal_p": False,
-            "v2_to_uv2": V2_TO_UV2,
         },
     )
 
-    fig = plt.figure(figsize=(7.2, 7.2))
-    outer = GridSpec(2, 2, figure=fig, hspace=0.42, wspace=0.35)
+    fig = plt.figure(figsize=(7.2, 6.2))
+    outer = GridSpec(2, 2, figure=fig, height_ratios=[1.0, 1.15], hspace=0.38, wspace=0.32)
 
     # A forest ROI
     ax = fig.add_subplot(outer[0, 0])
@@ -479,7 +478,7 @@ def figure_4() -> None:
     ax.set_title("ROI ERD effects", loc="left")
     ax.text(0.98, 0.02, "FDR q<0.05 (all)", transform=ax.transAxes, ha="right", va="bottom", fontsize=6, color=GRAY)
 
-    # B topomaps via nested GridSpec
+    # B topomaps
     gs_b = outer[0, 1].subgridspec(1, 3, width_ratios=[1, 1, 0.08], wspace=0.15)
     ax_mu = fig.add_subplot(gs_b[0, 0])
     ax_beta = fig.add_subplot(gs_b[0, 1])
@@ -511,8 +510,8 @@ def figure_4() -> None:
     cb.ax.tick_params(labelsize=5)
     ax_mu.set_xlabel("Scalp ME−MI (sensor-space)", fontsize=6.5)
 
-    # C spatial paired
-    ax = fig.add_subplot(outer[1, 0])
+    # C spatial paired (full width)
+    ax = fig.add_subplot(outer[1, :])
     panel_label(ax, "C")
     sm = paired["bacc_sm"].to_numpy()
     sc = paired["bacc_sc"].to_numpy()
@@ -530,6 +529,7 @@ def figure_4() -> None:
     ax.set_xticklabels(["Sensorimotor", "Peripheral\ncontrol"])
     ax.set_ylabel("Balanced accuracy")
     ax.set_ylim(0.35, 0.90)
+    ax.set_xlim(-0.7, 1.7)
     ax.set_title(f"Spatial control (paired N={spat['common_n']})", loc="left")
     ax.text(
         0.02,
@@ -541,7 +541,7 @@ def figure_4() -> None:
         va="bottom",
         fontsize=6.5,
     )
-    inset = ax.inset_axes([0.58, 0.58, 0.40, 0.38])
+    inset = ax.inset_axes([0.72, 0.55, 0.25, 0.40])
     inset.hist(dlt, bins=18, color=PRIMARY, edgecolor="white", lw=0.3, alpha=0.85)
     inset.axvline(0, color=CHANCE, ls="--", lw=0.8)
     inset.axvline(spat["mean_difference_sm_minus_sc"], color=BLACK, lw=1.0)
@@ -549,12 +549,32 @@ def figure_4() -> None:
     inset.tick_params(labelsize=5)
     inset.set_yticks([])
 
-    # D robustness + E08 nested
-    gs_d = outer[1, 1].subgridspec(2, 1, height_ratios=[1.35, 1.0], hspace=0.55)
-    ax_rob = fig.add_subplot(gs_d[0, 0])
-    ax_e08 = fig.add_subplot(gs_d[1, 0])
-    panel_label(ax_rob, "D")
+    save_figure(fig, "Figure_4_Physiology_Spatial", main=True)
 
+
+def figure_5() -> None:
+    """Robustness + protocol-state (former Fig4 panel D, preserved style)."""
+    rob, prim_m = _robustness_table()
+    pairs = pd.read_csv(REV / "e08_matched_pairs.csv").copy()
+    pairs["precue_beta_me_uv2"] = pairs["precue_beta_me"] * V2_TO_UV2
+    pairs["precue_beta_mi_uv2"] = pairs["precue_beta_mi"] * V2_TO_UV2
+    pairs["delta_beta_uv2"] = pairs["precue_beta_me_uv2"] - pairs["precue_beta_mi_uv2"]
+
+    export_csv("Figure_5A_robustness_source.csv", rob)
+    export_csv("Figure_5B_e08_source.csv", pairs)
+    export_json(
+        "Figure_5_annotations.json",
+        {
+            "primary_bacc": prim_m,
+            "v2_to_uv2": V2_TO_UV2,
+            "unit_note": "Pre-cue β displayed as µV² via exact V²×1e12 conversion",
+        },
+    )
+
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 3.6), gridspec_kw={"width_ratios": [1.15, 1.0]})
+
+    ax_rob = axes[0]
+    panel_label(ax_rob, "A")
     y = np.arange(len(rob))
     ax_rob.errorbar(
         rob["bacc"],
@@ -563,32 +583,33 @@ def figure_4() -> None:
         fmt="o",
         color=PRIMARY,
         ecolor=BLACK,
-        ms=4,
-        capsize=2,
+        ms=4.5,
+        capsize=2.5,
         elinewidth=0.9,
     )
     chance_vline(ax_rob)
     ax_rob.axvline(prim_m, color=GRAY, ls=":", lw=0.8)
     ax_rob.set_yticks(y)
-    ax_rob.set_yticklabels([f"{r.analysis} (N={r.n})" for r in rob.itertuples()], fontsize=6)
+    ax_rob.set_yticklabels([f"{r.analysis} (N={r.n})" for r in rob.itertuples()], fontsize=7)
     ax_rob.invert_yaxis()
-    ax_rob.set_xlabel("BAcc", fontsize=7)
+    ax_rob.set_xlabel("BAcc")
     ax_rob.set_xlim(0.58, 0.65)
-    ax_rob.set_title("Robustness + protocol state", loc="left", fontsize=9)
-    ax_rob.text(0.98, 0.98, "Sensitivity", transform=ax_rob.transAxes, ha="right", va="top", fontsize=6, color=GRAY)
+    ax_rob.set_title("Sensitivity estimates", loc="left")
 
+    ax_e08 = axes[1]
+    panel_label(ax_e08, "B")
     x = np.arange(len(pairs))
     w = 0.35
     ax_e08.bar(x - w / 2, pairs["precue_beta_me_uv2"], width=w, color=ME, edgecolor=BLACK, lw=0.3, label="ME")
     ax_e08.bar(x + w / 2, pairs["precue_beta_mi_uv2"], width=w, color=MI, edgecolor=BLACK, lw=0.3, label="MI")
     ax_e08.set_xticks(x)
-    ax_e08.set_xticklabels(pairs["pair_id"], fontsize=6)
-    ax_e08.set_ylabel("Pre-cue β (µV²)", fontsize=6.5)
-    ax_e08.legend(frameon=False, fontsize=6, loc="upper right", ncol=2)
-    ax_e08.set_title("Protocol-state diagnostic", fontsize=7, loc="left", pad=2)
-    ax_e08.tick_params(axis="y", labelsize=6)
+    ax_e08.set_xticklabels(pairs["pair_id"], fontsize=7)
+    ax_e08.set_ylabel("Pre-cue β (µV²)")
+    ax_e08.legend(frameon=False, fontsize=7, loc="upper right", ncol=2)
+    ax_e08.set_title("Protocol-state diagnostic", loc="left")
 
-    save_figure(fig, "Figure_4_Physiology_Robustness", main=True)
+    fig.tight_layout(w_pad=1.4)
+    save_figure(fig, "Figure_5_Robustness_Protocol", main=True)
 
 
 # ---------------------------------------------------------------------------
@@ -946,6 +967,8 @@ def main() -> int:
     figure_3()
     print("Figure 4...")
     figure_4()
+    print("Figure 5...")
+    figure_5()
     print("Supplementary...")
     figure_s1()
     figure_s2_secondary_table()

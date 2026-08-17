@@ -28,12 +28,18 @@ Freeze: `analysis-complete-pre-manuscript` (`6d0ce7a`). Captions carry detail re
 
 ---
 
-## Figure 4. Physiology, spatial control, robustness, and protocol state
+## Figure 4. Physiology and spatial evidence
 
 **(A)** Six prespecified ROI ME−MI ERD effects (μ/β × left/midline/right): mean dB effect with 95% bootstrap CI; zero line shown. Negative values indicate stronger ERD during ME than MI. All six effects meet the frozen FDR criterion (q < 0.05).  
 **(B)** Channel-level μ and β ME−MI scalp topographies from frozen channel summaries on standard electrode positions (sensor-space maps; not cortical source localization). Shared diverging scale; colorbar in dB.  
-**(C)** Spatial representation control among participants available for paired comparison (N = 77): sensorimotor versus peripheral/non-sensorimotor participant BAcc distributions with inset Δ (SM − SC). Spatial-control cohort BAcc = 0.583815 (95% CI [0.570681, 0.596700], N = 78). Mean SM − SC Δ = 0.038235 (95% CI [0.024501, 0.052142]). No confirmatory paired p-value. Peripheral channels contain ME/MI-associated information; sensorimotor features show additional discriminative information in the paired subset.  
-**(D)** Robustness forest of frozen participant-mean BAcc (±95% bootstrap CI where available) across primary, artifact-threshold, strict, duration, and sampling-rate sensitivity analyses (N annotated). Lower: matched-pair pre-cue β power (exact V²→µV² unit conversion for display) for ME versus MI pairs (protocol-state diagnostic). This diagnostic characterizes but does not remove fixed-order confounding.
+**(C)** Spatial representation control among participants available for paired comparison (N = 77): sensorimotor versus peripheral/non-sensorimotor participant BAcc distributions with inset Δ (SM − SC). Spatial-control cohort BAcc = 0.583815 (95% CI [0.570681, 0.596700], N = 78). Mean SM − SC Δ = 0.038235 (95% CI [0.024501, 0.052142]). No confirmatory paired p-value. Peripheral channels contain ME/MI-associated information; sensorimotor features show additional discriminative information in the paired subset.
+
+---
+
+## Figure 5. Robustness and protocol state
+
+**(A)** Robustness forest of frozen participant-mean BAcc (±95% bootstrap CI where available) across primary, artifact-threshold, strict, duration, and sampling-rate sensitivity analyses (N annotated). Near-identical estimates indicate stability across these analytical choices.  
+**(B)** Matched-pair pre-cue β power (exact V²→µV² unit conversion for display) for ME versus MI pairs (protocol-state diagnostic). This diagnostic characterizes but does not remove fixed-order confounding.
 
 ---
 
