@@ -1,0 +1,12 @@
+{
+  "n_audited": 109,
+  "n_primary": 102,
+  "n_ineligible": 7,
+  "n_strict": 51,
+  "n_sampling_rate": 99,
+  "excluded_128hz_subjects": [
+    88,
+    92,
+    100
+  ]
+}

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="408.96pt" height="375.614438pt" viewBox="0 0 408.96 375.614438" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-08-18T00:17:25.045674</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 375.614438 
+L 408.96 375.614438 
+L 408.96 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 124.128 58.255717 
+L 284.832 58.255717 
+Q 285.63552 58.255717 285.63552 57.748837 
+L 285.63552 29.870437 
+Q 285.63552 29.363557 284.832 29.363557 
+L 124.128 29.363557 
+Q 123.32448 29.363557 123.32448 29.870437 
+L 123.32448 57.748837 
+Q 123.32448 58.255717 124.128 58.255717 
+z
+" clip-path="url(#pa90ec3c533)" style="fill: #bbbbbb; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 104.04 116.546917 
+L 304.92 116.546917 
+Q 305.72352 116.546917 305.72352 116.040037 
+L 305.72352 84.360037 
+Q 305.72352 83.853157 304.92 83.853157 
+L 104.04 83.853157 
+Q 103.23648 83.853157 103.23648 84.360037 
+L 103.23648 116.040037 
+Q 103.23648 116.546917 104.04 116.546917 
+z
+" clip-path="url(#pa90ec3c533)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 104.04 177.372517 
+L 304.92 177.372517 
+Q 305.72352 177.372517 305.72352 176.865637 
+L 305.72352 143.918437 
+Q 305.72352 143.411557 304.92 143.411557 
+L 104.04 143.411557 
+Q 103.23648 143.411557 103.23648 143.918437 
+L 103.23648 176.865637 
+Q 103.23648 177.372517 104.04 177.372517 
+z
+" clip-path="url(#pa90ec3c533)" style="fill: #e8f5e9; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 335.052 119.081317 
+L 397.3248 119.081317 
+Q 398.12832 119.081317 398.12832 118.574437 
+L 398.12832 83.092837 
+Q 398.12832 82.585957 397.3248 82.585957 
+L 335.052 82.585957 
+Q 334.24848 82.585957 334.24848 83.092837 
+L 334.24848 118.574437 
+Q 334.24848 119.081317 335.052 119.081317 
+z
+" clip-path="url(#pa90ec3c533)" style="fill: #fff3e0; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 43.776 243.266917 
+L 184.392 243.266917 
+Q 185.19552 243.266917 185.19552 242.760037 
+L 185.19552 207.278437 
+Q 185.19552 206.771558 184.392 206.771558 
+L 43.776 206.771558 
+Q 42.97248 206.771558 42.97248 207.278437 
+L 42.97248 242.760037 
+Q 42.97248 243.266917 43.776 243.266917 
+z
+" clip-path="url(#pa90ec3c533)" style="fill: #e3f2fd; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 224.568 243.266917 
+L 373.2192 243.266917 
+Q 374.02272 243.266917 374.02272 242.760037 
+L 374.02272 207.278437 
+Q 374.02272 206.771558 373.2192 206.771558 
+L 224.568 206.771558 
+Q 223.76448 206.771558 223.76448 207.278437 
+L 223.76448 242.760037 
+Q 223.76448 243.266917 224.568 243.266917 
+z
+" clip-path="url(#pa90ec3c533)" style="fill: #e3f2fd; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(166.450898 41.25744)">Audited participants</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(188.990742 50.258905)">N = 109</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 204.48 61.020787 
+Q 204.48 69.154617 204.48 76.282216 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 206.08 73.082216 
+L 204.48 76.282216 
+L 202.88 73.082216 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(171.788203 97.647547)">Primary eligibility</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(129.994453 106.649598)">(matched ME/MI pairs + epoch minima)</text>
+   </g>
+   <g id="patch_9">
+    <path d="M 204.48 119.30843 
+Q 204.48 128.07955 204.48 135.844441 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+    <path d="M 206.08 132.644441 
+L 204.48 135.844441 
+L 202.88 132.644441 
+" style="fill: none; stroke: #000000; stroke-width: 0.9; stroke-linecap: round"/>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(168.424922 157.83984)">Primary E01 cohort</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(188.990742 166.841305)">N = 102</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 306.921444 100.833638 
+Q 318.982667 100.833638 330.149464 100.833638 
+" style="fill: none; stroke: #666666; stroke-width: 0.8; stroke-linecap: round"/>
+    <path d="M 326.949464 99.233637 
+L 330.149464 100.833638 
+L 326.949464 102.433638 
+" style="fill: none; stroke: #666666; stroke-width: 0.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(349.162228 98.28144)">Ineligible</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(355.471017 107.282905)">N = 7</text>
+   </g>
+   <g id="patch_11">
+    <path d="M 162.51197 179.027782 
+Q 140.19626 190.172306 118.680741 200.917213 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
+    <path d="M 122.258449 200.918923 
+L 118.680741 200.917213 
+L 120.828734 198.056072 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 246.44803 179.027782 
+Q 268.76374 190.172306 290.279259 200.917213 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
+    <path d="M 288.131266 198.056072 
+L 290.279259 200.917213 
+L 286.701551 200.918923 
+" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: round"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(70.599234 217.966015)">Strict sensitivity cohort</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(100.98068 226.96748)">N = 51</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(79.71232 235.96953)">(stricter cell rules)</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(252.083053 217.966015)">Sampling-rate sensitivity</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(285.79028 226.96748)">N = 99</text>
+    <text style="font-size: 7.5px; font-family: 'DejaVu Sans'" transform="translate(254.942428 235.96953)">(excl. S088/S092/S100)</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 7.5px; font-family: 'DejaVu Sans'; text-anchor: start" x="15.6528" y="260.500837" transform="rotate(-0 15.6528 260.500837)">Ineligibility reasons (frozen reason codes):</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 6.3px; font-family: 'DejaVu Sans'; text-anchor: start" x="17.6616" y="275.425453" transform="rotate(-0 17.6616 275.425453)">• n=3: Insufficient ME epochs after rejection / Insufficient MI epochs after rejection</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 6.3px; font-family: 'DejaVu Sans'; text-anchor: start" x="17.6616" y="289.364653" transform="rotate(-0 17.6616 289.364653)">• n=1: Insufficient ME epochs after rejection</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 6.3px; font-family: 'DejaVu Sans'; text-anchor: start" x="17.6616" y="303.303853" transform="rotate(-0 17.6616 303.303853)">• n=1: Insufficient matched ME/MI pairs / No usable unilateral matched pair / Insufficient ME epoch…</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 6.3px; font-family: 'DejaVu Sans'; text-anchor: start" x="17.6616" y="317.243053" transform="rotate(-0 17.6616 317.243053)">• n=1: Movement composition incomplete across modes / Insufficient ME epochs after rejection</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 6.3px; font-family: 'DejaVu Sans'; text-anchor: start" x="17.6616" y="331.182253" transform="rotate(-0 17.6616 331.182253)">• n=1: No retained epochs after preprocessing</text>
+   </g>
+   <g id="text_13">
+    <text style="font-style: italic; font-size: 6.5px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #666666" x="204.48" y="363.144038" transform="rotate(-0 204.48 363.144038)">Counts/reasons from frozen participant_eligibility.csv and sampling-rate summary.</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: start" x="3.6" y="11.198437" transform="rotate(-0 3.6 11.198437)">Cohort eligibility and sensitivity subsets</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pa90ec3c533">
+   <rect x="3.6" y="17.198437" width="401.76" height="354.816"/>
+  </clipPath>
+ </defs>
+</svg>

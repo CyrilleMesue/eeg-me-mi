@@ -1,0 +1,45 @@
+{
+  "approved_exact_copies": {
+    "Figure_S3_Movement_Decoding": "Figure_S2_Movement_Decoding",
+    "Figure_S4_Channel_ERD": "Figure_S3_Channel_ERD",
+    "Figure_S5_Laterality": "Figure_S4_Laterality",
+    "Figure_S7_Artifact_Sensitivity": "Figure_S6_Artifact_Sensitivity",
+    "Figure_S9_E08_Diagnostics": "Figure_S8_E08_Diagnostics",
+    "Figure_S11_Comparator_Distributions": "Figure_S9_Comparator_Distributions"
+  },
+  "redesigned": {
+    "Figure_S1_Cohort_Eligibility": "redesigned from old S1",
+    "Figure_S5_Participant_Heterogeneity": "redesigned from old S6",
+    "Figure_S7_Rejection_Audit": "label cleanup from old S8",
+    "Figure_S10_Duration_Sampling_Participant": "redesigned from old S10 (nonredundant)"
+  },
+  "removed_as_figure": {
+    "Figure_S2_Secondary_Metrics": "Table 2"
+  },
+  "mapping_notes": [
+    [
+      "Figure_S3_Movement_Decoding",
+      "Figure_S2_Movement_Decoding"
+    ],
+    [
+      "Figure_S4_Channel_ERD",
+      "Figure_S3_Channel_ERD"
+    ],
+    [
+      "Figure_S5_Laterality",
+      "Figure_S4_Laterality"
+    ],
+    [
+      "Figure_S7_Artifact_Sensitivity",
+      "Figure_S6_Artifact_Sensitivity"
+    ],
+    [
+      "Figure_S9_E08_Diagnostics",
+      "Figure_S8_E08_Diagnostics"
+    ],
+    [
+      "Figure_S11_Comparator_Distributions",
+      "Figure_S9_Comparator_Distributions"
+    ]
+  ]
+}

@@ -1,0 +1,6 @@
+reason_label,n
+Insufficient ME epochs after rejection,1
+Insufficient ME epochs after rejection / Insufficient MI epochs after rejection,3
+Insufficient matched ME/MI pairs / No usable unilateral matched pair / Insufficient ME epochs after rejection / Insufficient MI epochs after rejection,1
+Movement composition incomplete across modes / Insufficient ME epochs after rejection,1
+No retained epochs after preprocessing,1

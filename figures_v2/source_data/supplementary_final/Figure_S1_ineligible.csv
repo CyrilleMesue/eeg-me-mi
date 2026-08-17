@@ -1,0 +1,8 @@
+subject,reason_codes,reason_label,reason_detail
+9,INSUFFICIENT_MATCHED_PAIRS|MISSING_UNILATERAL_PAIR|INSUFFICIENT_ME_EPOCHS|INSUFFICIENT_MI_EPOCHS,Insufficient matched ME/MI pairs / No usable unilateral matched pair / Insufficient ME epochs after rejection / Insufficient MI epochs after rejection,fewer than two usable matched ME/MI pairs; no usable unilateral matched pair; fewer than required ME epochs after rejection; fewer than required MI epochs after rejection
+13,INSUFFICIENT_ME_EPOCHS,Insufficient ME epochs after rejection,fewer than required ME epochs after rejection
+17,INSUFFICIENT_ME_EPOCHS|INSUFFICIENT_MI_EPOCHS,Insufficient ME epochs after rejection / Insufficient MI epochs after rejection,fewer than required ME epochs after rejection; fewer than required MI epochs after rejection
+22,MOVEMENT_COMPOSITION|INSUFFICIENT_ME_EPOCHS,Movement composition incomplete across modes / Insufficient ME epochs after rejection,movement composition not represented in both modes; fewer than required ME epochs after rejection
+24,INSUFFICIENT_ME_EPOCHS|INSUFFICIENT_MI_EPOCHS,Insufficient ME epochs after rejection / Insufficient MI epochs after rejection,fewer than required ME epochs after rejection; fewer than required MI epochs after rejection
+48,INSUFFICIENT_ME_EPOCHS|INSUFFICIENT_MI_EPOCHS,Insufficient ME epochs after rejection / Insufficient MI epochs after rejection,fewer than required ME epochs after rejection; fewer than required MI epochs after rejection
+109,NO_EPOCHS,No retained epochs after preprocessing,no retained epochs after preprocessing

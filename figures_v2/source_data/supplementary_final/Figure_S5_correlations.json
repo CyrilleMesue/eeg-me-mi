@@ -1,0 +1,12 @@
+{
+  "mean_abs_erd_vs_bacc": {
+    "spearman_rho": 0.0828729594226555,
+    "p_uncorrected": 0.4076216543591613
+  },
+  "n_epochs_vs_bacc": {
+    "spearman_rho": -0.0422477412525775,
+    "p_uncorrected": 0.6733090184914131
+  },
+  "mean_rejection_rate_vs_bacc": "undefined_in_freeze_omitted",
+  "label": "EXPLORATORY"
+}
