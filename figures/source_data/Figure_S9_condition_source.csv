@@ -1,0 +1,5 @@
+scope,condition,epochs_before,epochs_rejected,epochs_retained,rejection_proportion
+full_attempted,ME,9731,1145,8586,0.117665193710821
+full_attempted,MI,9709,1038,8671,0.1069111133999382
+e01_primary_cohort,ME,9110,662,8448,0.0726673984632272
+e01_primary_cohort,MI,9079,587,8492,0.0646546976539266
