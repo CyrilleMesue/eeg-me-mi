@@ -1,0 +1,12 @@
+{
+  "n_participants": 102,
+  "mean_me_minus_mi": 0.008213455725232507,
+  "median_me_minus_mi": 0.0,
+  "iqr_low": 0.0,
+  "iqr_high": 0.011111111111111112,
+  "range_min": -0.23979328165374675,
+  "range_max": 0.26666666666666666,
+  "bootstrap_ci_low": -0.00529784033350078,
+  "bootstrap_ci_high": 0.021887111982712596,
+  "formal_p_prespecified": false
+}

@@ -1,0 +1,9 @@
+{
+  "e01_bacc": 0.6179239767273408,
+  "e01_n": 102.0,
+  "reference_bacc": 0.6179239767,
+  "abs_delta_vs_reference": 2.7340796293628955e-11,
+  "unchanged": true,
+  "e07_not_rerun": true,
+  "e05_not_overwritten": true
+}

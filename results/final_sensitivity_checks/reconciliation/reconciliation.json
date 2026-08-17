@@ -1,0 +1,11 @@
+{
+  "issues": [],
+  "notes": [
+    "definitive rejection_qc.csv has n_rejected=0 because mode=minimal defers PTP filtering; label-specific audit uses metadata ptp_uv instead."
+  ],
+  "primary_n_eligibility": 102,
+  "primary_n_audit": 102,
+  "e01_oof_epochs": 16913,
+  "audit_retained_epochs_primary_subjects_before_eligibility_filter": 16940,
+  "reconcile_ok": true
+}

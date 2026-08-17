@@ -1,0 +1,27 @@
+{
+  "primary_n": 102,
+  "sensitivity_n": 99,
+  "excluded_subjects": [
+    88,
+    92,
+    100
+  ],
+  "primary_bacc": 0.6179239767,
+  "sensitivity_bacc": 0.6208994042979062,
+  "primary_ci": [
+    0.6035525544008872,
+    0.632899080752947
+  ],
+  "sensitivity_ci": [
+    0.6068336331790134,
+    0.6355133396657872
+  ],
+  "absolute_bacc_difference": 0.002975427597906255,
+  "roc_auc": 0.6730214326479781,
+  "macro_f1": 0.6127015501950797,
+  "mcc": 0.248349792007539,
+  "accuracy": 0.6208537777510595,
+  "conclusion": "STABLE",
+  "fold_handling": "frozen_outer_folds_minus_excluded_subjects",
+  "elapsed_sec": 119.1901992179919
+}

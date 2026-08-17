@@ -1,0 +1,32 @@
+{
+  "parent_git_commit": "3b615ed1a8e455918d6e9d90bfb5c4e42ae44adc",
+  "parent_git_tag": "m2-preexec-fir-windows-candidate",
+  "git_dirty": true,
+  "config_path": "configs/full.yaml",
+  "config_sha256": "6c619f6039964085506c22f38d5b35647afacac1143e122868704f37438f795a",
+  "software_versions": {
+    "python": "3.13.11",
+    "platform": "Linux-5.14.0-284.30.1.el9_2.x86_64-x86_64-with-glibc2.34",
+    "mne": "1.12.1",
+    "numpy": "2.5.2",
+    "pandas": "2.3.3",
+    "scipy": "1.18.0",
+    "scikit_learn": "1.9.0"
+  },
+  "random_seed": 2026,
+  "frozen_e01": {
+    "n": 102,
+    "bacc": 0.6179239767,
+    "bootstrap_ci": [
+      0.6035525544008872,
+      0.632899080752947
+    ],
+    "fold_source": "results/full/e01/erd_lr/fold_assignments.csv",
+    "fold_logic": "KFold on unique participants with shuffle=True, random_state=seed; sensitivity uses frozen assignments with S088/S092/S100 removed"
+  },
+  "reason": "Final sampling-rate sensitivity and ME/MI rejection audit before manuscript freeze",
+  "does_not_overwrite": [
+    "results/definitive/",
+    "results/postdefinitive_e05/"
+  ]
+}

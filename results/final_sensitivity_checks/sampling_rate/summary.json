@@ -1,0 +1,13 @@
+{
+  "balanced_accuracy": 0.6208994042979062,
+  "roc_auc": 0.6730214326479781,
+  "macro_f1": 0.6127015501950797,
+  "sensitivity": 0.6162342741589771,
+  "specificity": 0.6255645344368354,
+  "average_precision": 0.6704253686880832,
+  "mcc": 0.248349792007539,
+  "accuracy": 0.6208537777510595,
+  "n_participants": 99.0,
+  "experiment": "E01_sampling_rate_sensitivity",
+  "model": "erd_lr"
+}

@@ -1,0 +1,8 @@
+{
+  "common_n": 99,
+  "mean_difference_sens_minus_primary": 0.0005225802012783282,
+  "bootstrap_ci_low": -0.0015521080555754953,
+  "bootstrap_ci_high": 0.0024862816498251623,
+  "note": "Descriptive only. Outer-fold test membership for common subjects is preserved; outer-train composition changes where excluded subjects were removed, so inner tuning / fitted models may differ.",
+  "formal_p_prespecified": false
+}

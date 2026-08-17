@@ -59,6 +59,52 @@ def assert_participant_disjoint(assignments: pd.DataFrame) -> None:
             raise AssertionError(f"Fold {fold} participant overlap: {sorted(overlap)}")
 
 
+def filter_fold_assignments(
+    assignments: pd.DataFrame,
+    *,
+    exclude_subjects: set[int] | frozenset[int],
+) -> pd.DataFrame:
+    """Drop subjects from frozen fold assignments; keep remaining membership unchanged."""
+    required = {"fold", "role", "subject"}
+    if not required <= set(assignments):
+        raise ValueError(f"Missing assignment columns: {sorted(required - set(assignments))}")
+    excl = {int(s) for s in exclude_subjects}
+    out = assignments.loc[~assignments["subject"].astype(int).isin(excl)].copy()
+    out["subject"] = out["subject"].astype(int)
+    assert_participant_disjoint(out)
+    remaining = set(out["subject"])
+    if remaining & excl:
+        raise AssertionError("Excluded subjects still present after filter")
+    return out.reset_index(drop=True)
+
+
+def make_group_folds_from_assignments(
+    groups: np.ndarray,
+    assignments: pd.DataFrame,
+) -> list[tuple[int, np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
+    """Build outer train/test index tuples from frozen (fold, role, subject) rows."""
+    groups = np.asarray(groups).astype(int)
+    assert_participant_disjoint(assignments)
+    present = set(np.unique(groups).tolist())
+    assigned = set(assignments["subject"].astype(int))
+    if present != assigned:
+        missing = sorted(present - assigned)
+        extra = sorted(assigned - present)
+        raise ValueError(
+            f"Assignment/data subject mismatch; missing_in_assignments={missing}; "
+            f"extra_in_assignments={extra}"
+        )
+    folds: list[tuple[int, np.ndarray, np.ndarray, np.ndarray, np.ndarray]] = []
+    for fold in sorted(assignments["fold"].unique()):
+        frame = assignments.loc[assignments["fold"] == fold]
+        train_groups = frame.loc[frame.role == "train", "subject"].astype(int).to_numpy()
+        test_groups = frame.loc[frame.role == "test", "subject"].astype(int).to_numpy()
+        train_idx = np.flatnonzero(np.isin(groups, train_groups))
+        test_idx = np.flatnonzero(np.isin(groups, test_groups))
+        folds.append((int(fold), train_idx, test_idx, train_groups, test_groups))
+    return folds
+
+
 def _inner_cv(train_groups: np.ndarray, n_splits: int, seed: int):
     unique = np.unique(train_groups)
     n_splits = min(n_splits, len(unique))
@@ -120,22 +166,33 @@ def run_nested_group_cv(
     inner_folds: int,
     seed: int,
     scoring: str = PARTICIPANT_MEAN_SCORING,
+    fold_assignments: pd.DataFrame | None = None,
 ) -> dict:
-    """Nested participant-disjoint CV with leakage assertions."""
+    """Nested participant-disjoint CV with leakage assertions.
+
+    If ``fold_assignments`` is provided (columns fold/role/subject), outer folds
+    are taken from that table instead of regenerating via ``seed``. Inner-fold
+    tuning still uses ``seed + fold`` on the *outer-train* subject set.
+    """
     X = np.asarray(X)
     y = np.asarray(y).astype(int)
     groups = np.asarray(groups).astype(int)
 
-    assignments = fold_assignment_table(groups, outer_folds, seed)
-    assert_participant_disjoint(assignments)
+    if fold_assignments is not None:
+        assignments = fold_assignments.copy()
+        assignments["subject"] = assignments["subject"].astype(int)
+        assert_participant_disjoint(assignments)
+        outer_iter = make_group_folds_from_assignments(groups, assignments)
+    else:
+        assignments = fold_assignment_table(groups, outer_folds, seed)
+        assert_participant_disjoint(assignments)
+        outer_iter = make_group_folds(groups, outer_folds, seed)
 
     oof_rows = []
     fold_rows = []
     tuning_rows = []
 
-    for fold, train_idx, test_idx, train_groups, test_groups in make_group_folds(
-        groups, outer_folds, seed
-    ):
+    for fold, train_idx, test_idx, train_groups, test_groups in outer_iter:
         assert set(train_groups).isdisjoint(set(test_groups))
         assert set(groups[train_idx]).isdisjoint(set(groups[test_idx]))
 

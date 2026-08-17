@@ -1,0 +1,5 @@
+laterality,condition,epochs_before,epochs_rejected,epochs_retained,rejection_proportion
+bilateral,ME,4868,630,4238,0.12941659819227608
+bilateral,MI,4867,514,4353,0.10560920484898295
+unilateral,ME,4863,515,4348,0.10590170676537117
+unilateral,MI,4842,524,4318,0.10821974390747625

@@ -1,0 +1,6 @@
+fold,n_test_before,n_test_after,removed_from_test,remaining_test_unchanged
+1,21,21,,True
+2,21,19,88|100,True
+3,20,20,,True
+4,20,20,,True
+5,20,19,92,True

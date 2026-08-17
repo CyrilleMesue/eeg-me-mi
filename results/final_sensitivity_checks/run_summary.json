@@ -1,0 +1,79 @@
+{
+  "sampling_rate": {
+    "primary_n": 102,
+    "sensitivity_n": 99,
+    "excluded_subjects": [
+      88,
+      92,
+      100
+    ],
+    "primary_bacc": 0.6179239767,
+    "sensitivity_bacc": 0.6208994042979062,
+    "primary_ci": [
+      0.6035525544008872,
+      0.632899080752947
+    ],
+    "sensitivity_ci": [
+      0.6068336331790134,
+      0.6355133396657872
+    ],
+    "absolute_bacc_difference": 0.002975427597906255,
+    "roc_auc": 0.6730214326479781,
+    "macro_f1": 0.6127015501950797,
+    "mcc": 0.248349792007539,
+    "accuracy": 0.6208537777510595,
+    "conclusion": "STABLE",
+    "fold_handling": "frozen_outer_folds_minus_excluded_subjects",
+    "elapsed_sec": 119.1901992179919
+  },
+  "rejection_audit": {
+    "primary_cohort": {
+      "ME": {
+        "epochs_before": 9110,
+        "epochs_rejected": 662,
+        "epochs_retained": 8448,
+        "rejection_proportion": 0.07266739846322723
+      },
+      "MI": {
+        "epochs_before": 9079,
+        "epochs_rejected": 587,
+        "epochs_retained": 8492,
+        "rejection_proportion": 0.06465469765392665
+      },
+      "absolute_difference_me_minus_mi": 0.008012700809300582
+    },
+    "full_attempted": {
+      "ME": {
+        "epochs_before": 9731,
+        "epochs_rejected": 1145,
+        "epochs_retained": 8586,
+        "rejection_proportion": 0.11766519371082108
+      },
+      "MI": {
+        "epochs_before": 9709,
+        "epochs_rejected": 1038,
+        "epochs_retained": 8671,
+        "rejection_proportion": 0.1069111133999382
+      }
+    },
+    "participant_paired": {
+      "n_participants": 102,
+      "mean_me_minus_mi": 0.008213455725232507,
+      "median_me_minus_mi": 0.0,
+      "iqr_low": 0.0,
+      "iqr_high": 0.011111111111111112,
+      "range_min": -0.23979328165374675,
+      "range_max": 0.26666666666666666,
+      "bootstrap_ci_low": -0.00529784033350078,
+      "bootstrap_ci_high": 0.021887111982712596,
+      "formal_p_prespecified": false
+    },
+    "retained_class_balance": {
+      "retained_me": 8448,
+      "retained_mi": 8492,
+      "me_mi_ratio": 0.9948186528497409
+    },
+    "n_ptp_gt_200_full": 2183,
+    "n_epochs_before_full": 19440
+  }
+}
