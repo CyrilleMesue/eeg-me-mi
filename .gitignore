@@ -1,3 +1,6 @@
+# Git ignore — local environments, caches, raw data, review archives
+
+# Virtualenvs / packaging
 .venv/
 .venv-*/
 __pycache__/
@@ -7,17 +10,32 @@ __pycache__/
 htmlcov/
 *.egg-info/
 src/*.egg-info/
+
+# Raw EEG and regenerable caches (never commit)
 data/
 cache/
-results/*
-!results/.gitkeep
 *.edf
 *.fif
 *.npy
 *.npz
+
+# Most analysis outputs are local; selected result trees may be force-tracked
+results/*
+!results/.gitkeep
+
+# SLURM runtime logs
 slurm/logs/
+
+# Local milestone / remediation audit working dirs
 audit_package_m2/
 audit_package_m2_remediation/
+
+# Bulky review / audit ZIP packages and checksum sidecars
 *.zip
 *.sha256
+eeg_me_mi_*_review_package/
+eeg_me_mi_*_audit_package/
 
+# Editor / OS clutter
+.DS_Store
+Thumbs.db

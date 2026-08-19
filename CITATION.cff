@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite it as below. Manuscript in preparation."
+title: "Cross-Participant EEG Decoding of Motor Execution and Motor Imagery Reveals Sensorimotor and Protocol-State Contributions"
+type: software
+authors:
+  - family-names: Mesue
+    given-names: Cyrille
+repository-code: "https://github.com/CyrilleMesue/eeg-me-mi"
+abstract: >-
+  Participant-disjoint EEG analysis of motor execution versus motor imagery on
+  PhysioNet EEGMMIDB, quantifying sensorimotor and protocol-state contributions
+  under fixed run ordering.
+keywords:
+  - EEG
+  - motor imagery
+  - motor execution
+  - EEGMMIDB
+  - cross-participant decoding
