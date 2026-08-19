@@ -1,4 +1,4 @@
-"""Frozen-path helpers for publication figures."""
+"""Frozen-path helpers for publication figures V2."""
 
 from __future__ import annotations
 
@@ -20,7 +20,6 @@ def boot_ci(path: Path, metric: str = "balanced_accuracy") -> tuple[float, float
     return float(row["mean"]), float(row["ci_low"]), float(row["ci_high"])
 
 
-# Canonical frozen locations
 E01 = ROOT / "results/definitive/full/e01"
 E00 = ROOT / "results/definitive/full/e00"
 E02 = ROOT / "results/definitive/full/e02"
@@ -30,3 +29,4 @@ CMP = ROOT / "results/definitive/full/comparisons"
 E05 = ROOT / "results/postdefinitive_e05"
 REV = ROOT / "results/postdefinitive_review"
 SENS = ROOT / "results/final_sensitivity_checks"
+QC = ROOT / "results/definitive/full/qc"

@@ -1,7 +1,7 @@
 # Supplementary figures — final review package
 
 **Freeze:** `analysis-complete-pre-manuscript` (`6d0ce7a`)  
-**Generator:** `PYTHONPATH=src python figures_v2/scripts/generate_supplementary_final.py`  
+**Generator:** `PYTHONPATH=src python figures/scripts/generate_supplementary_final.py`  
 **Main figures 1–5:** not modified in this task.
 
 ---
@@ -74,4 +74,4 @@
 ---
 
 ## Validation
-See `figures_v2/previews/supplementary_final_validation.txt`.
+See `figures/previews/supplementary_final_validation.txt`.

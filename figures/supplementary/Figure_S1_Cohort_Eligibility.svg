@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="349.2pt" height="249.758437pt" viewBox="0 0 349.2 249.758437" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="202.5pt" height="197.446594pt" viewBox="0 0 202.5 197.446594" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-08-17T23:02:31.614662</dc:date>
+    <dc:date>2026-08-19T11:07:54.165033</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -21,91 +21,91 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 249.758437 
-L 349.2 249.758437 
-L 349.2 0 
+   <path d="M 0 197.446594 
+L 202.5 197.446594 
+L 202.5 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
   </g>
   <g id="axes_1">
    <g id="patch_2">
-    <path d="M 74.16 80.673637 
-L 275.04 80.673637 
-Q 281.736 80.673637 281.736 76.238437 
-L 281.736 36.321637 
-Q 281.736 31.886437 275.04 31.886437 
-L 74.16 31.886437 
-Q 67.464 31.886437 67.464 36.321637 
-L 67.464 76.238437 
-Q 67.464 80.673637 74.16 80.673637 
+    <path d="M 42.66 64.338754 
+L 159.84 64.338754 
+Q 163.746 64.338754 163.746 60.790594 
+L 163.746 28.857154 
+Q 163.746 25.308994 159.84 25.308994 
+L 42.66 25.308994 
+Q 38.754 25.308994 38.754 28.857154 
+L 38.754 60.790594 
+Q 38.754 64.338754 42.66 64.338754 
 z
-" clip-path="url(#p454dfac482)" style="fill: #dddddd; stroke: #000000; stroke-linejoin: miter"/>
+" clip-path="url(#p282a26eb3f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
-    <path d="M 74.16 147.201638 
-L 275.04 147.201638 
-Q 281.736 147.201638 281.736 142.766437 
-L 281.736 102.849637 
-Q 281.736 98.414437 275.04 98.414437 
-L 74.16 98.414437 
-Q 67.464 98.414437 67.464 102.849637 
-L 67.464 142.766437 
-Q 67.464 147.201638 74.16 147.201638 
+    <path d="M 42.66 117.561154 
+L 159.84 117.561154 
+Q 163.746 117.561154 163.746 114.012994 
+L 163.746 82.079554 
+Q 163.746 78.531394 159.84 78.531394 
+L 42.66 78.531394 
+Q 38.754 78.531394 38.754 82.079554 
+L 38.754 114.012994 
+Q 38.754 117.561154 42.66 117.561154 
 z
-" clip-path="url(#p454dfac482)" style="fill: #dddddd; stroke: #000000; stroke-linejoin: miter"/>
+" clip-path="url(#p282a26eb3f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
-    <path d="M 74.16 213.729637 
-L 275.04 213.729637 
-Q 281.736 213.729637 281.736 209.294437 
-L 281.736 169.377637 
-Q 281.736 164.942437 275.04 164.942437 
-L 74.16 164.942437 
-Q 67.464 164.942437 67.464 169.377637 
-L 67.464 209.294437 
-Q 67.464 213.729637 74.16 213.729637 
+    <path d="M 42.66 170.783554 
+L 159.84 170.783554 
+Q 163.746 170.783554 163.746 167.235394 
+L 163.746 135.301954 
+Q 163.746 131.753794 159.84 131.753794 
+L 42.66 131.753794 
+Q 38.754 131.753794 38.754 135.301954 
+L 38.754 167.235394 
+Q 38.754 170.783554 42.66 170.783554 
 z
-" clip-path="url(#p454dfac482)" style="fill: #dddddd; stroke: #000000; stroke-linejoin: miter"/>
+" clip-path="url(#p282a26eb3f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.7; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
-    <text style="font-size: 9px; font-family: 'DejaVu Sans'" transform="translate(137.088281 53.217401)">Audited subjects</text>
-    <text style="font-size: 9px; font-family: 'DejaVu Sans'" transform="translate(158.873203 64.019159)">N=109</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'" transform="translate(85.759375 42.10153)">Audited</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'" transform="translate(87.270625 51.703092)">N=109</text>
    </g>
    <g id="text_2">
-    <text style="font-size: 9px; font-family: 'DejaVu Sans'" transform="translate(139.528828 119.745401)">Primary eligible</text>
-    <text style="font-size: 9px; font-family: 'DejaVu Sans'" transform="translate(158.873203 130.547159)">N=102</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'" transform="translate(70.075625 95.32393)">Primary eligible</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'" transform="translate(87.270625 104.925492)">N=102</text>
    </g>
    <g id="text_3">
-    <text style="font-size: 9px; font-family: 'DejaVu Sans'" transform="translate(122.775469 186.273049)">Primary E01 nested CV</text>
-    <text style="font-size: 9px; font-family: 'DejaVu Sans'" transform="translate(123.315469 197.07551)">participant-mean BAcc</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'" transform="translate(76.904375 148.546018)">Primary E01</text>
+    <text style="font-size: 8px; font-family: 'DejaVu Sans'" transform="translate(80.800625 158.148205)">nested CV</text>
    </g>
    <g id="patch_5">
-    <path d="M 174.6 78.236227 
-Q 174.6 89.543914 174.6 99.733567 
+    <path d="M 101.25 62.789032 
+Q 101.25 71.433503 101.25 78.95994 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
-    <path d="M 176.4 96.133567 
-L 174.6 99.733567 
-L 172.8 96.133567 
+    <path d="M 102.85 75.75994 
+L 101.25 78.95994 
+L 99.65 75.75994 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
    </g>
    <g id="patch_6">
-    <path d="M 174.6 144.764227 
-Q 174.6 156.071914 174.6 166.261567 
+    <path d="M 101.25 116.011432 
+Q 101.25 124.655903 101.25 132.18234 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
-    <path d="M 176.4 162.661567 
-L 174.6 166.261567 
-L 172.8 162.661567 
+    <path d="M 102.85 128.98234 
+L 101.25 132.18234 
+L 99.65 128.98234 
 " style="fill: none; stroke: #000000; stroke-linecap: round"/>
    </g>
    <g id="text_4">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle" x="174.6" y="14.798437" transform="rotate(-0 174.6 14.798437)">Figure S1 — Cohort / eligibility overview</text>
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle" x="101.25" y="10.438594" transform="rotate(-0 101.25 10.438594)">Cohort eligibility</text>
    </g>
   </g>
  </g>
  <defs>
-  <clipPath id="p454dfac482">
-   <rect x="7.2" y="20.798437" width="334.8" height="221.76"/>
+  <clipPath id="p282a26eb3f">
+   <rect x="3.6" y="16.438594" width="195.3" height="177.408"/>
   </clipPath>
  </defs>
 </svg>

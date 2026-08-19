@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="600.3pt" height="189.230437pt" viewBox="0 0 600.3 189.230437" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="344.79pt" height="167.010594pt" viewBox="0 0 344.79 167.010594" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-08-17T23:02:32.075322</dc:date>
+    <dc:date>2026-08-19T11:07:54.418173</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -21,9 +21,9 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 189.230437 
-L 600.3 189.230437 
-L 600.3 0 
+   <path d="M 0 167.010594 
+L 344.79 167.010594 
+L 344.79 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
@@ -31,448 +31,305 @@ z
   <g id="axes_1">
    <g id="table_1">
     <g id="patch_2">
-     <path d="M 7.2 79.214438 
-L 80.4375 79.214438 
-L 80.4375 62.414438 
-L 7.2 62.414438 
+     <path d="M 3.6 33.810594 
+L 116.13 33.810594 
+L 116.13 17.610594 
+L 3.6 17.610594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_1">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="43.81875" y="72.892875" transform="rotate(-0 43.81875 72.892875)">model</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="27.789031" transform="rotate(-0 59.865 27.789031)">Metric</text>
     </g>
     <g id="patch_3">
-     <path d="M 80.4375 79.214438 
-L 153.675 79.214438 
-L 153.675 62.414438 
-L 80.4375 62.414438 
+     <path d="M 116.13 33.810594 
+L 228.66 33.810594 
+L 228.66 17.610594 
+L 116.13 17.610594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_2">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="117.05625" y="72.892563" transform="rotate(-0 117.05625 72.892563)">BAcc</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="27.789031" transform="rotate(-0 172.395 27.789031)">Value</text>
     </g>
     <g id="patch_4">
-     <path d="M 153.675 79.214438 
-L 226.9125 79.214438 
-L 226.9125 62.414438 
-L 153.675 62.414438 
+     <path d="M 228.66 33.810594 
+L 341.19 33.810594 
+L 341.19 17.610594 
+L 228.66 17.610594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_3">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="190.29375" y="72.892563" transform="rotate(-0 190.29375 72.892563)">ROC-AUC</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="27.789031" transform="rotate(-0 284.925 27.789031)">Role</text>
     </g>
     <g id="patch_5">
-     <path d="M 226.9125 79.214438 
-L 300.15 79.214438 
-L 300.15 62.414438 
-L 226.9125 62.414438 
+     <path d="M 3.6 50.010594 
+L 116.13 50.010594 
+L 116.13 33.810594 
+L 3.6 33.810594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_4">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="263.53125" y="72.892563" transform="rotate(-0 263.53125 72.892563)">Macro-F1</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="43.989031" transform="rotate(-0 59.865 43.989031)">BAcc (primary)</text>
     </g>
     <g id="patch_6">
-     <path d="M 300.15 79.214438 
-L 373.3875 79.214438 
-L 373.3875 62.414438 
-L 300.15 62.414438 
+     <path d="M 116.13 50.010594 
+L 228.66 50.010594 
+L 228.66 33.810594 
+L 116.13 33.810594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_5">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="336.76875" y="72.892875" transform="rotate(-0 336.76875 72.892875)">Sensitivity</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="43.988719" transform="rotate(-0 172.395 43.988719)">0.618</text>
     </g>
     <g id="patch_7">
-     <path d="M 373.3875 79.214438 
-L 446.625 79.214438 
-L 446.625 62.414438 
-L 373.3875 62.414438 
+     <path d="M 228.66 50.010594 
+L 341.19 50.010594 
+L 341.19 33.810594 
+L 228.66 33.810594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_6">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="410.00625" y="72.892875" transform="rotate(-0 410.00625 72.892875)">Specificity</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="43.989031" transform="rotate(-0 284.925 43.989031)">primary</text>
     </g>
     <g id="patch_8">
-     <path d="M 446.625 79.214438 
-L 519.8625 79.214438 
-L 519.8625 62.414438 
-L 446.625 62.414438 
+     <path d="M 3.6 66.210594 
+L 116.13 66.210594 
+L 116.13 50.010594 
+L 3.6 50.010594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_7">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="483.24375" y="72.892563" transform="rotate(-0 483.24375 72.892563)">MCC</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="60.188719" transform="rotate(-0 59.865 60.188719)">ROC-AUC</text>
     </g>
     <g id="patch_9">
-     <path d="M 519.8625 79.214438 
-L 593.1 79.214438 
-L 593.1 62.414438 
-L 519.8625 62.414438 
+     <path d="M 116.13 66.210594 
+L 228.66 66.210594 
+L 228.66 50.010594 
+L 116.13 50.010594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_8">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="556.48125" y="72.892563" transform="rotate(-0 556.48125 72.892563)">N</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="60.188719" transform="rotate(-0 172.395 60.188719)">0.670</text>
     </g>
     <g id="patch_10">
-     <path d="M 7.2 96.014438 
-L 80.4375 96.014438 
-L 80.4375 79.214438 
-L 7.2 79.214438 
+     <path d="M 228.66 66.210594 
+L 341.19 66.210594 
+L 341.19 50.010594 
+L 228.66 50.010594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_9">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="43.81875" y="89.692563" transform="rotate(-0 43.81875 89.692563)">Dummy</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="60.189031" transform="rotate(-0 284.925 60.189031)">secondary</text>
     </g>
     <g id="patch_11">
-     <path d="M 80.4375 96.014438 
-L 153.675 96.014438 
-L 153.675 79.214438 
-L 80.4375 79.214438 
+     <path d="M 3.6 82.410594 
+L 116.13 82.410594 
+L 116.13 66.210594 
+L 3.6 66.210594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_10">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="117.05625" y="89.692563" transform="rotate(-0 117.05625 89.692563)">0.500</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="76.388719" transform="rotate(-0 59.865 76.388719)">Macro-F1</text>
     </g>
     <g id="patch_12">
-     <path d="M 153.675 96.014438 
-L 226.9125 96.014438 
-L 226.9125 79.214438 
-L 153.675 79.214438 
+     <path d="M 116.13 82.410594 
+L 228.66 82.410594 
+L 228.66 66.210594 
+L 116.13 66.210594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_11">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="190.29375" y="89.692563" transform="rotate(-0 190.29375 89.692563)">0.500</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="76.388719" transform="rotate(-0 172.395 76.388719)">0.609</text>
     </g>
     <g id="patch_13">
-     <path d="M 226.9125 96.014438 
-L 300.15 96.014438 
-L 300.15 79.214438 
-L 226.9125 79.214438 
+     <path d="M 228.66 82.410594 
+L 341.19 82.410594 
+L 341.19 66.210594 
+L 228.66 66.210594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_12">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="263.53125" y="89.692563" transform="rotate(-0 263.53125 89.692563)">0.331</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="76.389031" transform="rotate(-0 284.925 76.389031)">secondary</text>
     </g>
     <g id="patch_14">
-     <path d="M 300.15 96.014438 
-L 373.3875 96.014438 
-L 373.3875 79.214438 
-L 300.15 79.214438 
+     <path d="M 3.6 98.610594 
+L 116.13 98.610594 
+L 116.13 82.410594 
+L 3.6 82.410594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_13">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="336.76875" y="89.692563" transform="rotate(-0 336.76875 89.692563)">0.206</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="92.589031" transform="rotate(-0 59.865 92.589031)">Sensitivity</text>
     </g>
     <g id="patch_15">
-     <path d="M 373.3875 96.014438 
-L 446.625 96.014438 
-L 446.625 79.214438 
-L 373.3875 79.214438 
+     <path d="M 116.13 98.610594 
+L 228.66 98.610594 
+L 228.66 82.410594 
+L 116.13 82.410594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_14">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="410.00625" y="89.692563" transform="rotate(-0 410.00625 89.692563)">0.794</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="92.588719" transform="rotate(-0 172.395 92.588719)">0.614</text>
     </g>
     <g id="patch_16">
-     <path d="M 446.625 96.014438 
-L 519.8625 96.014438 
-L 519.8625 79.214438 
-L 446.625 79.214438 
+     <path d="M 228.66 98.610594 
+L 341.19 98.610594 
+L 341.19 82.410594 
+L 228.66 82.410594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_15">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="483.24375" y="89.692563" transform="rotate(-0 483.24375 89.692563)">0.000</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="92.589031" transform="rotate(-0 284.925 92.589031)">secondary</text>
     </g>
     <g id="patch_17">
-     <path d="M 519.8625 96.014438 
-L 593.1 96.014438 
-L 593.1 79.214438 
-L 519.8625 79.214438 
+     <path d="M 3.6 114.810594 
+L 116.13 114.810594 
+L 116.13 98.610594 
+L 3.6 98.610594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_16">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="556.48125" y="89.692563" transform="rotate(-0 556.48125 89.692563)">102</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="108.789031" transform="rotate(-0 59.865 108.789031)">Specificity</text>
     </g>
     <g id="patch_18">
-     <path d="M 7.2 112.814437 
-L 80.4375 112.814437 
-L 80.4375 96.014437 
-L 7.2 96.014437 
+     <path d="M 116.13 114.810594 
+L 228.66 114.810594 
+L 228.66 98.610594 
+L 116.13 98.610594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_17">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="43.81875" y="106.492562" transform="rotate(-0 43.81875 106.492562)">CSP-LDA</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="108.788719" transform="rotate(-0 172.395 108.788719)">0.622</text>
     </g>
     <g id="patch_19">
-     <path d="M 80.4375 112.814437 
-L 153.675 112.814437 
-L 153.675 96.014437 
-L 80.4375 96.014437 
+     <path d="M 228.66 114.810594 
+L 341.19 114.810594 
+L 341.19 98.610594 
+L 228.66 98.610594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_18">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="117.05625" y="106.492562" transform="rotate(-0 117.05625 106.492562)">0.556</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="108.789031" transform="rotate(-0 284.925 108.789031)">secondary</text>
     </g>
     <g id="patch_20">
-     <path d="M 153.675 112.814437 
-L 226.9125 112.814437 
-L 226.9125 96.014437 
-L 153.675 96.014437 
+     <path d="M 3.6 131.010594 
+L 116.13 131.010594 
+L 116.13 114.810594 
+L 3.6 114.810594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_19">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="190.29375" y="106.492562" transform="rotate(-0 190.29375 106.492562)">0.611</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="124.989031" transform="rotate(-0 59.865 124.989031)">Average precision</text>
     </g>
     <g id="patch_21">
-     <path d="M 226.9125 112.814437 
-L 300.15 112.814437 
-L 300.15 96.014437 
-L 226.9125 96.014437 
+     <path d="M 116.13 131.010594 
+L 228.66 131.010594 
+L 228.66 114.810594 
+L 116.13 114.810594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_20">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="263.53125" y="106.492562" transform="rotate(-0 263.53125 106.492562)">0.491</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="124.988719" transform="rotate(-0 172.395 124.988719)">0.668</text>
     </g>
     <g id="patch_22">
-     <path d="M 300.15 112.814437 
-L 373.3875 112.814437 
-L 373.3875 96.014437 
-L 300.15 96.014437 
+     <path d="M 228.66 131.010594 
+L 341.19 131.010594 
+L 341.19 114.810594 
+L 228.66 114.810594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_21">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="336.76875" y="106.492562" transform="rotate(-0 336.76875 106.492562)">0.534</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="124.989031" transform="rotate(-0 284.925 124.989031)">secondary</text>
     </g>
     <g id="patch_23">
-     <path d="M 373.3875 112.814437 
-L 446.625 112.814437 
-L 446.625 96.014437 
-L 373.3875 96.014437 
+     <path d="M 3.6 147.210594 
+L 116.13 147.210594 
+L 116.13 131.010594 
+L 3.6 131.010594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_22">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="410.00625" y="106.492562" transform="rotate(-0 410.00625 106.492562)">0.577</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="141.188719" transform="rotate(-0 59.865 141.188719)">MCC</text>
     </g>
     <g id="patch_24">
-     <path d="M 446.625 112.814437 
-L 519.8625 112.814437 
-L 519.8625 96.014437 
-L 446.625 96.014437 
+     <path d="M 116.13 147.210594 
+L 228.66 147.210594 
+L 228.66 131.010594 
+L 116.13 131.010594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_23">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="483.24375" y="106.492562" transform="rotate(-0 483.24375 106.492562)">0.132</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="141.188719" transform="rotate(-0 172.395 141.188719)">0.242</text>
     </g>
     <g id="patch_25">
-     <path d="M 519.8625 112.814437 
-L 593.1 112.814437 
-L 593.1 96.014437 
-L 519.8625 96.014437 
+     <path d="M 228.66 147.210594 
+L 341.19 147.210594 
+L 341.19 131.010594 
+L 228.66 131.010594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_24">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="556.48125" y="106.492562" transform="rotate(-0 556.48125 106.492562)">102</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="141.189031" transform="rotate(-0 284.925 141.189031)">secondary</text>
     </g>
     <g id="patch_26">
-     <path d="M 7.2 129.614438 
-L 80.4375 129.614438 
-L 80.4375 112.814438 
-L 7.2 112.814438 
+     <path d="M 3.6 163.410594 
+L 116.13 163.410594 
+L 116.13 147.210594 
+L 3.6 147.210594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_25">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="43.81875" y="123.292875" transform="rotate(-0 43.81875 123.292875)">Riemannian-LR</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="59.865" y="157.388719" transform="rotate(-0 59.865 157.388719)">Accuracy</text>
     </g>
     <g id="patch_27">
-     <path d="M 80.4375 129.614438 
-L 153.675 129.614438 
-L 153.675 112.814438 
-L 80.4375 112.814438 
+     <path d="M 116.13 163.410594 
+L 228.66 163.410594 
+L 228.66 147.210594 
+L 116.13 147.210594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_26">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="117.05625" y="123.292563" transform="rotate(-0 117.05625 123.292563)">0.583</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="157.388719" transform="rotate(-0 172.395 157.388719)">0.617</text>
     </g>
     <g id="patch_28">
-     <path d="M 153.675 129.614438 
-L 226.9125 129.614438 
-L 226.9125 112.814438 
-L 153.675 112.814438 
+     <path d="M 228.66 163.410594 
+L 341.19 163.410594 
+L 341.19 147.210594 
+L 228.66 147.210594 
 z
 " style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
     </g>
     <g id="text_27">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="190.29375" y="123.292563" transform="rotate(-0 190.29375 123.292563)">0.670</text>
-    </g>
-    <g id="patch_29">
-     <path d="M 226.9125 129.614438 
-L 300.15 129.614438 
-L 300.15 112.814438 
-L 226.9125 112.814438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_28">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="263.53125" y="123.292563" transform="rotate(-0 263.53125 123.292563)">0.528</text>
-    </g>
-    <g id="patch_30">
-     <path d="M 300.15 129.614438 
-L 373.3875 129.614438 
-L 373.3875 112.814438 
-L 300.15 112.814438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_29">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="336.76875" y="123.292563" transform="rotate(-0 336.76875 123.292563)">0.601</text>
-    </g>
-    <g id="patch_31">
-     <path d="M 373.3875 129.614438 
-L 446.625 129.614438 
-L 446.625 112.814438 
-L 373.3875 112.814438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_30">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="410.00625" y="123.292563" transform="rotate(-0 410.00625 123.292563)">0.566</text>
-    </g>
-    <g id="patch_32">
-     <path d="M 446.625 129.614438 
-L 519.8625 129.614438 
-L 519.8625 112.814438 
-L 446.625 112.814438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_31">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="483.24375" y="123.292563" transform="rotate(-0 483.24375 123.292563)">0.195</text>
-    </g>
-    <g id="patch_33">
-     <path d="M 519.8625 129.614438 
-L 593.1 129.614438 
-L 593.1 112.814438 
-L 519.8625 112.814438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_32">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="556.48125" y="123.292563" transform="rotate(-0 556.48125 123.292563)">102</text>
-    </g>
-    <g id="patch_34">
-     <path d="M 7.2 146.414437 
-L 80.4375 146.414437 
-L 80.4375 129.614438 
-L 7.2 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_33">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="43.81875" y="140.092875" transform="rotate(-0 43.81875 140.092875)">ERD-LR (primary)</text>
-    </g>
-    <g id="patch_35">
-     <path d="M 80.4375 146.414437 
-L 153.675 146.414437 
-L 153.675 129.614438 
-L 80.4375 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_34">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="117.05625" y="140.092562" transform="rotate(-0 117.05625 140.092562)">0.618</text>
-    </g>
-    <g id="patch_36">
-     <path d="M 153.675 146.414437 
-L 226.9125 146.414437 
-L 226.9125 129.614438 
-L 153.675 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_35">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="190.29375" y="140.092562" transform="rotate(-0 190.29375 140.092562)">0.670</text>
-    </g>
-    <g id="patch_37">
-     <path d="M 226.9125 146.414437 
-L 300.15 146.414437 
-L 300.15 129.614438 
-L 226.9125 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_36">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="263.53125" y="140.092562" transform="rotate(-0 263.53125 140.092562)">0.609</text>
-    </g>
-    <g id="patch_38">
-     <path d="M 300.15 146.414437 
-L 373.3875 146.414437 
-L 373.3875 129.614438 
-L 300.15 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_37">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="336.76875" y="140.092562" transform="rotate(-0 336.76875 140.092562)">0.614</text>
-    </g>
-    <g id="patch_39">
-     <path d="M 373.3875 146.414437 
-L 446.625 146.414437 
-L 446.625 129.614438 
-L 373.3875 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_38">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="410.00625" y="140.092562" transform="rotate(-0 410.00625 140.092562)">0.622</text>
-    </g>
-    <g id="patch_40">
-     <path d="M 446.625 146.414437 
-L 519.8625 146.414437 
-L 519.8625 129.614438 
-L 446.625 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_39">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="483.24375" y="140.092562" transform="rotate(-0 483.24375 140.092562)">0.242</text>
-    </g>
-    <g id="patch_41">
-     <path d="M 519.8625 146.414437 
-L 593.1 146.414437 
-L 593.1 129.614438 
-L 519.8625 129.614438 
-z
-" style="fill: #ffffff; stroke: #000000; stroke-linejoin: miter"/>
-    </g>
-    <g id="text_40">
-     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="556.48125" y="140.092562" transform="rotate(-0 556.48125 140.092562)">102</text>
+     <text style="font-size: 8px; font-family: 'DejaVu Sans'; text-anchor: middle" x="284.925" y="157.389031" transform="rotate(-0 284.925 157.389031)">secondary</text>
     </g>
    </g>
-   <g id="text_41">
-    <text style="font-size: 10px; font-family: 'DejaVu Sans'; text-anchor: middle" x="300.15" y="14.798438" transform="rotate(-0 300.15 14.798438)">Figure S2 — Full secondary metrics (descriptive; BAcc primary)</text>
+   <g id="text_28">
+    <text style="font-size: 9px; font-family: 'DejaVu Sans'; text-anchor: middle" x="172.395" y="10.438594" transform="rotate(-0 172.395 10.438594)">Secondary metrics (prefer Table 2)</text>
    </g>
   </g>
  </g>

@@ -12,8 +12,8 @@ Scope: documentation and repository hygiene only (no scientific reanalysis).
 | `eeg_me_mi_milestone2_audit_package.zip` | repo root (deleted in WT; present in HEAD) | ~571 KiB | Yes (tracked) | Snapshot of src/configs/tests/docs + toy/pilot/audit outputs + packaging notes | Code/docs/configs/tests live in tree; pilot/audit results mostly local/gitignored | Packaging-only uniques: `DATA_DICTIONARY.md`, `OMITTED_FILES.md`, freeze text files | **Remove ZIP**; preserve packaging docs under `docs/archive/milestone2_audit_package/` |
 | `eeg_me_mi_postdefinitive_controls_review_package.zip` | repo root (deleted in WT) | ~1.1 MiB | Yes | Post-definitive E05 results + scripts + review markdown | `results/postdefinitive_*` (tracked), `scripts/`, `docs/e05_*`, `docs/postdefinitive_*` | No unique science beyond tracked results/docs | **Remove ZIP** |
 | `eeg_me_mi_final_sensitivity_checks_review_package.zip` | repo root (deleted in WT) | ~1.6 MiB archive listing | Yes | Final sensitivity results + scripts + report | `results/final_sensitivity_checks/` (tracked), `scripts/run_final_sensitivity_checks.py`, `docs/final_two_sensitivity_checks_report.md` | No | **Remove ZIP** |
-| `eeg_me_mi_publication_figures_v2_review.zip` | repo root | ~3.4 MiB | No (gitignored) | Copy of `figures_v2/` main/supplementary review bundle | `figures_v2/` already versioned | No | **Delete local ZIP** |
-| `eeg_me_mi_supplementary_figures_final_review.zip` | repo root | ~2.3 MiB | No (gitignored) | Supplementary final figures + generators | `figures_v2/supplementary_final/` + scripts | No | **Delete local ZIP** |
+| `eeg_me_mi_publication_figures_review.zip` | repo root | ~3.4 MiB | No (gitignored) | Copy of `figures/` main/supplementary review bundle | `figures/` already versioned | No | **Delete local ZIP** |
+| `eeg_me_mi_supplementary_figures_final_review.zip` | repo root | ~2.3 MiB | No (gitignored) | Supplementary final figures + generators | `figures/supplementary_final/` + scripts | No | **Delete local ZIP** |
 
 Related sidecars (checksums): three tracked `*.sha256` files for the GitHub-tracked ZIPs, plus ignored local sha256 files for remediation/definitive packages — all removed from the working tree with the archives.
 
@@ -29,7 +29,7 @@ From Git (this commit):
 
 Deleted locally only (were never tracked):
 
-- `eeg_me_mi_publication_figures_v2_review.zip`
+- `eeg_me_mi_publication_figures_review.zip`
 - `eeg_me_mi_supplementary_figures_final_review.zip`
 - orphaned `eeg_me_mi_milestone2_remediation_audit_package.sha256`
 - orphaned `eeg_me_mi_definitive_results_review_package.sha256`
@@ -84,7 +84,7 @@ Did **not** ignore publication figures, configs, tests, or intentionally force-t
 | Tests | `tests/` |
 | SLURM/TRUBA | `slurm/` |
 | Results | `results/` (mostly local; selected post-definitive / sensitivity trees tracked) |
-| Publication figures | `figures_v2/` (current), `figures/` (v1) |
+| Publication figures | `figures/` (current), `figures/` (v1) |
 | Documentation | `docs/` |
 | Historical code | `historical/` (retained) |
 | Temporary / audit packages | local `audit_package_*`, `eeg_me_mi_*_review_package/` (gitignored) |
@@ -116,9 +116,9 @@ PYTHONPATH=src .venv/bin/pytest -q
 | `PYTHONPATH=src .venv/bin/pytest -q` | 73 passed |
 | `eeg-me-mi run-toy --no-download configs/toy.yaml` | Success (~1 m 23 s); wrote `results/toy` |
 | `eeg-me-mi run-full --dry-run --skip-e07 --no-download configs/full.yaml` | Success |
-| `PYTHONPATH=src python figures_v2/scripts/generate_all_figures_v2.py` | Success (~14 s) |
-| `PYTHONPATH=src python figures_v2/scripts/validate_figures_v2.py` | 34/34 passed |
-| `PYTHONPATH=src python figures_v2/scripts/validate_supplementary_final.py` | 37/37 passed |
+| `PYTHONPATH=src python figures/scripts/generate_all_figures.py` | Success (~14 s) |
+| `PYTHONPATH=src python figures/scripts/validate_figures.py` | 34/34 passed |
+| `PYTHONPATH=src python figures/scripts/validate_supplementary_final.py` | 37/37 passed |
 
 **Not** launched: definitive full analysis; E07 ×1000.
 
@@ -128,4 +128,4 @@ PYTHONPATH=src .venv/bin/pytest -q
 2. Decide whether to force-track a curated subset of `results/definitive/` summaries for GitHub reviewers.
 3. Commit or discard the remaining unrelated local figure/SLURM/doc edits in a separate change.
 4. Optionally delete or archive the local `eeg_me_mi_definitive_results_review_package/` directory after confirming `results/definitive/` is retained locally.
-5. Keep review ZIPs out of Git; regenerate on demand from `figures_v2/` / `scripts/` if needed for external review.
+5. Keep review ZIPs out of Git; regenerate on demand from `figures/` / `scripts/` if needed for external review.

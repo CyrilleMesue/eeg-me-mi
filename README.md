@@ -125,8 +125,7 @@ tests/             Automated integrity and unit tests
 scripts/           Post-definitive / sensitivity helper scripts
 slurm/             SLURM/TRUBA job scripts (e.g. E07)
 results/           Local and selectively versioned machine-readable outputs
-figures/           Publication figures (v1 layout)
-figures_v2/        Current main + supplementary publication figures and generators
+figures/           Publication figures (main, supplementary, generators)
 docs/              Plans, audits, execution reports, captions, tables
 historical/        Legacy Colab/reanalysis code retained for provenance
 ```
@@ -168,17 +167,17 @@ Definitive execution provenance (cohorts, metrics, E07 wall time) is summarized 
 
 ## Reproducing figures
 
-Current publication layout lives under `figures_v2/`.
+Current publication layout lives under `figures/`.
 
 ```bash
-PYTHONPATH=src python figures_v2/scripts/generate_all_figures_v2.py
-PYTHONPATH=src python figures_v2/scripts/validate_figures_v2.py
-PYTHONPATH=src python figures_v2/scripts/generate_supplementary_final.py
-PYTHONPATH=src python figures_v2/scripts/validate_supplementary_final.py
+PYTHONPATH=src python figures/scripts/generate_all_figures.py
+PYTHONPATH=src python figures/scripts/validate_figures.py
+PYTHONPATH=src python figures/scripts/generate_supplementary_final.py
+PYTHONPATH=src python figures/scripts/validate_supplementary_final.py
 ```
 
-- Main figures: `figures_v2/main/`
-- Supplementary figures: `figures_v2/supplementary_final/`
+- Main figures: `figures/main/`
+- Supplementary figures: `figures/supplementary_final/`
 - Captions / review notes: `docs/publication_figure_captions_v2.md`, `docs/supplementary_figure_captions_final.md`
 
 ## Tests and validation
@@ -217,9 +216,9 @@ These numbers depend on hardware, QOS constraints, and software versions; see `d
 
 Representative main figure (current v2 layout):
 
-![Figure 2 — primary decoding](figures_v2/main/Figure_2_Primary_Decoding.png)
+![Figure 2 — primary decoding](figures/main/Figure_2_Primary_Decoding.png)
 
-Browse `figures_v2/main/` for Figures 1–5 and `figures_v2/supplementary_final/` for supplementary panels.
+Browse `figures/main/` for Figures 1–5 and `figures/supplementary_final/` for supplementary panels.
 
 ## Citation
 

@@ -1,8 +1,8 @@
 # Publication figures V2 — source map
 
 Freeze: `analysis-complete-pre-manuscript` (`6d0ce7a`)  
-Generator: `figures_v2/scripts/generate_all_figures_v2.py`  
-All quantitative values read from frozen machine-readable outputs (and exported under `figures_v2/source_data/`). V1 source_data is not overwritten.
+Generator: `figures/scripts/generate_all_figures.py`  
+All quantitative values read from frozen machine-readable outputs (and exported under `figures/source_data/`). V1 source_data is not overwritten.
 
 CI definition (unless noted): participant-bootstrap 95% percentile interval from named `bootstrap_summary.csv`.
 

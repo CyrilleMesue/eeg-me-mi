@@ -1,9 +1,9 @@
 # Publication figures V2 review (V1 → V2)
 
 **Freeze (immutable):** `analysis-complete-pre-manuscript` @ `6d0ce7a`  
-**Generator:** `PYTHONPATH=src python figures_v2/scripts/generate_all_figures_v2.py`  
-**Validate:** `PYTHONPATH=src python figures_v2/scripts/validate_figures_v2.py`  
-**Contact sheet:** `figures_v2/previews/publication_figures_v2_contact_sheet.pdf`  
+**Generator:** `PYTHONPATH=src python figures/scripts/generate_all_figures.py`  
+**Validate:** `PYTHONPATH=src python figures/scripts/validate_figures.py`  
+**Contact sheet:** `figures/previews/publication_figures_contact_sheet.pdf`  
 **Do not tag** until researcher/ChatGPT visual approval.
 
 ---
@@ -91,10 +91,16 @@
 
 ## Validation
 
-Last run: **ALL VALIDATION CHECKS PASSED** (`figures_v2/previews/validation_report_v2.txt`).
+Last run: **ALL VALIDATION CHECKS PASSED** (`figures/previews/validation_report.txt`).
 
 ---
 
 ## Next step
 
-ChatGPT + researcher visual review of `eeg_me_mi_publication_figures_v2_review.zip`. Do not tag `publication-figures-v2` yet.
+ChatGPT + researcher visual review of `eeg_me_mi_publication_figures_review.zip`. Do not tag `publication-figures-v2` yet.
+## Fig 4–5 layout clarity revision (2026-08-18)
+
+- Figs 1–3 unchanged.
+- Fig 4C split into explicit C1 (distributions) and C2 (paired ΔBAcc violin + mean/CI; title: Paired ΔBAcc (sensorimotor − peripheral)).
+- Fig 5 separate canvas; 5B enlarged stacked protocol-state diagnostic.
+

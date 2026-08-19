@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Generate publication figures from frozen analysis outputs only.
+"""Publication Figures V2 — journal redesign from frozen outputs only.
 
-Does not rerun EEG preprocessing or modeling.
-Entry point: python figures/scripts/generate_all_figures.py
+Entry: PYTHONPATH=src python figures/scripts/generate_all_figures.py
+Does not rerun EEG analyses or alter frozen numerical results.
 """
 
 from __future__ import annotations
@@ -21,1086 +21,994 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "figures" / "scripts"))
 sys.path.insert(0, str(ROOT / "src"))
 
-from paths import CMP, E00, E01, E02, E03, E05, E07, REV, SENS, boot_ci, load_json  # noqa: E402
+from paths import CMP, E00, E01, E02, E03, E05, E07, QC, REV, SENS, boot_ci, load_json  # noqa: E402
 from style import (  # noqa: E402
+    BETA,
     BLACK,
-    BLUE,
     CHANCE,
     CONTROL,
+    FIG_PREV,
     FIG_SRC,
     GRAY,
     LIGHT,
+    ME,
+    MI,
+    MU,
+    NEUTRAL,
     NULL,
-    ORANGE,
     PRIMARY,
-    PURPLE,
-    SECONDARY,
-    VERM,
     apply_style,
-    chance_line,
+    chance_hline,
+    chance_vline,
     panel_label,
     save_figure,
 )
 
+# Exact unit conversion for Welch power stored in V² (MNE default) → µV²
+V2_TO_UV2 = 1e12
 
-def export_source(name: str, df: pd.DataFrame) -> None:
+
+def export_csv(name: str, df: pd.DataFrame) -> None:
     FIG_SRC.mkdir(parents=True, exist_ok=True)
     df.to_csv(FIG_SRC / name, index=False)
 
 
-def export_source_json(name: str, obj: dict) -> None:
+def export_json(name: str, obj: dict) -> None:
     FIG_SRC.mkdir(parents=True, exist_ok=True)
     (FIG_SRC / name).write_text(json.dumps(obj, indent=2) + "\n")
 
 
+def _channel_xy(channels: list[str]) -> np.ndarray:
+    import mne
+
+    info = mne.create_info(channels, 80.0, ch_types="eeg")
+    info.set_montage("standard_1005", on_missing="ignore")
+    pos = np.array([info["chs"][i]["loc"][:2] for i in range(len(channels))])
+    return pos
+
+
 # ---------------------------------------------------------------------------
-# Figure 1 — Study design (conceptual)
+# Figure 1 — Design and safeguards (3 panels)
 # ---------------------------------------------------------------------------
 
 
-def figure_1_study_design() -> None:
-    fig = plt.figure(figsize=(11.5, 10.5))
-    gs = GridSpec(3, 2, figure=fig, height_ratios=[1.0, 1.1, 1.0], hspace=0.45, wspace=0.35)
+def figure_1() -> None:
+    fig = plt.figure(figsize=(7.2, 6.4))
+    gs = GridSpec(2, 2, figure=fig, height_ratios=[1.0, 1.15], hspace=0.38, wspace=0.28)
 
-    # A — protocol
+    # A — fixed protocol order
     ax = fig.add_subplot(gs[0, 0])
     panel_label(ax, "A")
     ax.set_xlim(0, 10)
-    ax.set_ylim(0, 6)
+    ax.set_ylim(0, 5.2)
     ax.axis("off")
-    ax.set_title("EEGMMIDB matched ME→MI runs", loc="left", pad=6)
-    y = 4.5
-    for i, (me, mi, fam) in enumerate(
-        [
-            (3, 4, "L/R fist"),
-            (5, 6, "both fists/feet"),
-            (7, 8, "L/R fist"),
-            (9, 10, "both fists/feet"),
-            (11, 12, "L/R fist"),
-            (13, 14, "both fists/feet"),
-        ]
-    ):
-        x = 0.4 + i * 1.55
-        ax.add_patch(mpatches.FancyBboxPatch((x, y), 0.65, 0.9, boxstyle="round,pad=0.02", fc=PRIMARY, ec=BLACK, lw=0.6))
-        ax.text(x + 0.325, y + 0.45, f"ME\nR{me}", ha="center", va="center", color="white", fontsize=7, fontweight="bold")
-        ax.annotate("", xy=(x + 0.85, y + 0.45), xytext=(x + 0.65, y + 0.45), arrowprops=dict(arrowstyle="->", color=GRAY, lw=1))
-        ax.add_patch(mpatches.FancyBboxPatch((x + 0.9, y), 0.65, 0.9, boxstyle="round,pad=0.02", fc=SECONDARY, ec=BLACK, lw=0.6))
-        ax.text(x + 1.225, y + 0.45, f"MI\nR{mi}", ha="center", va="center", color="white", fontsize=7, fontweight="bold")
-        ax.text(x + 0.775, y - 0.35, fam, ha="center", va="top", fontsize=6.5, color=GRAY)
-    ax.text(0.2, 2.4, "Repetitions 1–3 across matched pairs", fontsize=8, color=BLACK)
-    ax.text(
-        0.2,
-        1.4,
-        "Condition is structurally coupled to run order.\n(ME always precedes matched MI; not randomized.)",
-        fontsize=8,
-        color=VERM,
-        style="italic",
-    )
+    ax.set_title("Fixed protocol order", loc="left", pad=4)
+    pairs = [(3, 4, "L/R fist"), (5, 6, "both"), (7, 8, "L/R fist"), (9, 10, "both"), (11, 12, "L/R fist"), (13, 14, "both")]
+    for i, (me_r, mi_r, fam) in enumerate(pairs):
+        y = 4.3 - (i % 3) * 1.25
+        x0 = 0.6 if i < 3 else 5.4
+        ax.add_patch(mpatches.FancyBboxPatch((x0, y), 1.35, 0.7, boxstyle="round,pad=0.02", fc=ME, ec=BLACK, lw=0.5))
+        ax.text(x0 + 0.675, y + 0.35, f"ME R{me_r}", ha="center", va="center", color="white", fontsize=7, fontweight="bold")
+        ax.annotate("", xy=(x0 + 1.85, y + 0.35), xytext=(x0 + 1.4, y + 0.35), arrowprops=dict(arrowstyle="->", color=BLACK, lw=0.9))
+        ax.add_patch(mpatches.FancyBboxPatch((x0 + 1.9, y), 1.35, 0.7, boxstyle="round,pad=0.02", fc=MI, ec=BLACK, lw=0.5))
+        ax.text(x0 + 2.575, y + 0.35, f"MI R{mi_r}", ha="center", va="center", color="white", fontsize=7, fontweight="bold")
+        ax.text(x0 + 1.75, y - 0.28, fam, ha="center", fontsize=6, color=GRAY)
+    ax.text(0.3, 0.25, "Fixed ME→MI ordering", fontsize=7.5, style="italic", color=GRAY)
 
-    # B — participant-disjoint CV
+    # B — temporal windows
     ax = fig.add_subplot(gs[0, 1])
     panel_label(ax, "B")
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 6)
-    ax.axis("off")
-    ax.set_title("Participant-disjoint nested evaluation", loc="left", pad=6)
-    boxes = [
-        (2.5, 5.0, "Participants (N=102)"),
-        (2.5, 3.7, "Outer-train participants"),
-        (2.5, 2.4, "Inner participant-disjoint C tuning"),
-        (2.5, 1.1, "Held-out outer-test participants"),
-    ]
-    for i, (x, y, lab) in enumerate(boxes):
-        ax.add_patch(mpatches.FancyBboxPatch((x, y - 0.35), 5, 0.7, boxstyle="round,pad=0.03", fc=LIGHT, ec=BLACK, lw=0.7))
-        ax.text(x + 2.5, y, lab, ha="center", va="center", fontsize=8)
-        if i < len(boxes) - 1:
-            ax.annotate("", xy=(5, boxes[i + 1][1] + 0.35), xytext=(5, y - 0.35), arrowprops=dict(arrowstyle="->", color=BLACK, lw=1))
-    ax.text(0.3, 0.25, "No participant contributes epochs to both outer train and outer test.", fontsize=7.5, color=GRAY)
-
-    # C — temporal windows
-    ax = fig.add_subplot(gs[1, :])
-    panel_label(ax, "C", x=-0.02)
-    ax.set_xlim(-2.2, 3.7)
-    ax.set_ylim(0, 3)
+    ax.set_title("Temporal windows", loc="left", pad=4)
+    # timeline from -2.2 to 3.7
+    ax.set_xlim(-2.3, 3.8)
+    ax.set_ylim(0, 3.2)
+    # regions
+    ax.axvspan(-2.0, -0.8375, ymin=0.35, ymax=0.78, color=CONTROL, alpha=0.45, lw=0)
+    ax.axvspan(-0.8375, 0.8375, ymin=0.35, ymax=0.78, color=LIGHT, alpha=0.9, lw=0)
+    ax.axvspan(0.8375, 3.5, ymin=0.35, ymax=0.78, color=PRIMARY, alpha=0.35, lw=0)
+    ax.axvline(0, color=BLACK, lw=1.1)
+    ax.plot([-2.3, 3.8], [1.0, 1.0], color=BLACK, lw=0.7)
+    ax.text(0, 2.85, "cue", ha="center", fontsize=7)
+    ax.text(-1.42, 2.35, "safe pre-cue", ha="center", fontsize=6.5)
+    ax.text(0, 2.35, "excluded", ha="center", fontsize=6.5, color=GRAY)
+    ax.text(2.15, 2.35, "post-cue task", ha="center", fontsize=6.5)
+    ax.text(-1.42, 0.55, "E00 power\nE01 baseline", ha="center", fontsize=6.5, color=BLACK)
+    ax.text(2.15, 0.55, "E01 ERD", ha="center", fontsize=6.5, color=BLACK)
+    ax.text(3.7, 0.15, "FIR-safe margins", ha="right", fontsize=6.5, style="italic", color=GRAY)
     ax.set_yticks([])
     ax.set_xlabel("Time relative to cue (s)")
-    ax.axvline(0, color=BLACK, lw=1.2)
-    ax.text(0.05, 2.7, "cue t=0", fontsize=8)
-    # excluded
-    ax.axvspan(-0.8375, 0.8375, color=LIGHT, alpha=1.0, zorder=0)
-    ax.text(0, 2.2, "excluded\ncue-adjacent", ha="center", fontsize=7, color=GRAY)
-    # E00 / baseline
-    ax.plot([-2.0, -0.8375], [1.5, 1.5], color=PRIMARY, lw=6, solid_capstyle="butt")
-    ax.text(-1.42, 1.75, "E00 / E01 baseline\n[−2.0, −0.8375]", ha="center", fontsize=8, color=PRIMARY)
-    # task
-    ax.plot([0.8375, 3.5], [1.5, 1.5], color=SECONDARY, lw=6, solid_capstyle="butt")
-    ax.text(2.15, 1.75, "E01 task\n[+0.8375, +3.5]", ha="center", fontsize=8, color=SECONDARY)
-    ax.text(-2.1, 0.4, "FIR-safe temporal margins", fontsize=8, style="italic", color=BLACK)
-    ax.set_title("Temporal feature definition", loc="left")
+    for spine in ("left", "top", "right"):
+        ax.spines[spine].set_visible(False)
 
-    # D — ERD pipeline
-    ax = fig.add_subplot(gs[2, 0])
-    panel_label(ax, "D")
+    # C — participant-disjoint pipeline
+    ax = fig.add_subplot(gs[1, :])
+    panel_label(ax, "C", x=-0.03)
+    ax.set_xlim(0, 12)
+    ax.set_ylim(0, 3.2)
     ax.axis("off")
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 5)
-    ax.set_title("ERD feature representation", loc="left")
-    steps = [
-        "21 sensorimotor channels",
-        "μ 8–13 Hz + β 13–30 Hz",
-        "42 ERD features",
-        "Nested L2 logistic regression",
-        "Participant-level OOF → mean BAcc",
+    ax.set_title("Participant-disjoint analysis", loc="left", pad=4)
+    boxes = [
+        (0.2, 1.2, 2.0, "21 SM channels\n× μ + β\n= 42 ERD features"),
+        (3.0, 1.2, 2.2, "Nested\nparticipant-disjoint\nCV"),
+        (5.9, 1.2, 2.0, "Held-out\nparticipants"),
+        (8.5, 1.2, 1.7, "Participant-level\nmetrics"),
+        (10.5, 1.2, 1.4, "Participant-\nmean BAcc"),
     ]
-    for i, s in enumerate(steps):
-        y = 4.2 - i * 0.75
-        ax.add_patch(mpatches.FancyBboxPatch((1.2, y - 0.28), 7.5, 0.55, boxstyle="round,pad=0.02", fc="white", ec=PRIMARY, lw=0.9))
-        ax.text(5, y, s, ha="center", va="center", fontsize=8)
-        if i < len(steps) - 1:
-            ax.annotate("", xy=(5, y - 0.28), xytext=(5, y - 0.47), arrowprops=dict(arrowstyle="->", color=GRAY))
+    for x, y, w, txt in boxes:
+        ax.add_patch(mpatches.FancyBboxPatch((x, y), w, 1.4, boxstyle="round,pad=0.03", fc="white", ec=BLACK, lw=0.7))
+        ax.text(x + w / 2, y + 0.7, txt, ha="center", va="center", fontsize=7)
+    for x in (2.25, 5.25, 7.95, 10.25):
+        ax.annotate("", xy=(x + 0.7, 1.9), xytext=(x, 1.9), arrowprops=dict(arrowstyle="->", color=BLACK, lw=0.9))
+    ax.text(6, 0.35, "No participant contributes epochs to both training and outer test", ha="center", fontsize=7, style="italic", color=GRAY)
 
-    # E — analysis logic
-    ax = fig.add_subplot(gs[2, 1])
-    panel_label(ax, "E")
-    ax.axis("off")
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 5)
-    ax.set_title("Analysis / control logic", loc="left")
-    flow = [
-        "Primary E01 (ERD-LR)",
-        "Pre-cue E00 control",
-        "Physiology (E03) / movements (E02)",
-        "Spatial control (E05)",
-        "Artifact / duration / sampling-rate",
-        "Run-order diagnostics (E08)",
-        "Structured permutation (E07)",
-    ]
-    for i, s in enumerate(flow):
-        y = 4.5 - i * 0.6
-        ax.text(1.0, y, "→  " + s if i else s, fontsize=8, va="center", color=BLACK if i == 0 else GRAY)
-
-    save_figure(fig, "Figure_1_Study_Design", main=True)
+    save_figure(fig, "Figure_1_Design_Safeguards", main=True)
 
 
 # ---------------------------------------------------------------------------
-# Figure 2 — Primary decoding
+# Figure 2 — Cross-participant decoding (3 panels)
 # ---------------------------------------------------------------------------
 
 
-def figure_2_primary() -> None:
+def figure_2() -> None:
     pm = pd.read_csv(E01 / "erd_lr/participant_metrics.csv")
     mean, lo, hi = boot_ci(E01 / "erd_lr/bootstrap_summary.csv")
     e07 = load_json(E07 / "e07_summary.json")
     null = pd.read_csv(E07 / "null_statistics.csv")
-    assert len(null) == 1000
 
     models = []
-    for name, label in [
-        ("dummy", "Dummy"),
-        ("csp_lda", "CSP-LDA"),
-        ("tangent_lr", "Riemannian-LR"),
-        ("erd_lr", "ERD-LR (primary)"),
+    for key, label, is_primary in [
+        ("dummy", "Dummy", False),
+        ("csp_lda", "CSP-LDA", False),
+        ("tangent_lr", "Riemannian-LR", False),
+        ("erd_lr", "ERD-LR", True),
     ]:
-        m, clo, chi = boot_ci(E01 / f"{name}/bootstrap_summary.csv")
-        models.append({"model": label, "key": name, "bacc": m, "ci_low": clo, "ci_high": chi})
+        m, clo, chi = boot_ci(E01 / f"{key}/bootstrap_summary.csv")
+        models.append({"model": label, "key": key, "primary": is_primary, "bacc": m, "ci_low": clo, "ci_high": chi})
     models_df = pd.DataFrame(models)
 
-    summary = load_json(E01 / "erd_lr/summary.json")
-    secondary = pd.DataFrame(
-        [
-            {"metric": "BAcc (primary)", "value": summary["balanced_accuracy"], "role": "primary"},
-            {"metric": "ROC-AUC", "value": summary["roc_auc"], "role": "secondary"},
-            {"metric": "Macro-F1", "value": summary["macro_f1"], "role": "secondary"},
-            {"metric": "Sensitivity", "value": summary["sensitivity"], "role": "secondary"},
-            {"metric": "Specificity", "value": summary["specificity"], "role": "secondary"},
-            {"metric": "MCC", "value": summary["mcc"], "role": "secondary"},
-        ]
-    )
-
-    export_source("Figure_2A_source.csv", pm[["subject", "balanced_accuracy", "n_epochs"]])
-    export_source("Figure_2B_source.csv", models_df)
-    export_source("Figure_2C_source.csv", null[["perm_id", "statistic"]])
-    export_source("Figure_2D_source.csv", secondary)
-    export_source_json(
+    export_csv("Figure_2A_source.csv", pm[["subject", "balanced_accuracy", "n_epochs"]])
+    export_csv("Figure_2B_source.csv", models_df)
+    export_csv("Figure_2C_source.csv", null[["perm_id", "statistic"]])
+    export_json(
         "Figure_2_annotations.json",
         {
-            "n": 102,
+            "n": int(pm["subject"].nunique()),
             "mean_bacc": mean,
             "ci": [lo, hi],
             "observed_e07": e07["observed_statistic"],
+            "n_null": len(null),
             "n_null_ge": e07["n_null_ge_observed"],
             "p_plusone": e07["p_value_plusone"],
         },
     )
 
-    fig, axes = plt.subplots(2, 2, figsize=(10.5, 8.2))
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.9), gridspec_kw={"width_ratios": [1.05, 1.0, 1.15]})
+
     # A
-    ax = axes[0, 0]
+    ax = axes[0]
     panel_label(ax, "A")
     vals = pm["balanced_accuracy"].to_numpy()
     rng = np.random.default_rng(2026)
-    x = 0.02 * rng.standard_normal(len(vals))
-    parts = ax.violinplot(vals, positions=[0], showmeans=False, showmedians=False, showextrema=False, widths=0.7)
+    jitter = 0.04 * rng.standard_normal(len(vals))
+    parts = ax.violinplot(vals, positions=[0], showmeans=False, showmedians=False, showextrema=False, widths=0.75)
     for b in parts["bodies"]:
         b.set_facecolor(PRIMARY)
-        b.set_alpha(0.25)
+        b.set_alpha(0.22)
         b.set_edgecolor(PRIMARY)
-    ax.scatter(x, vals, s=12, c=PRIMARY, alpha=0.55, edgecolors="none", zorder=3)
-    ax.errorbar(0.35, mean, yerr=[[mean - lo], [hi - mean]], fmt="o", color=BLACK, ms=6, capsize=4, zorder=4)
-    chance_line(ax)
-    ax.set_xlim(-0.7, 0.7)
+        b.set_linewidth(0.6)
+    ax.scatter(jitter, vals, s=9, c=PRIMARY, alpha=0.55, edgecolors="none", zorder=3)
+    ax.errorbar(0.42, mean, yerr=[[mean - lo], [hi - mean]], fmt="o", color=BLACK, ms=5, capsize=3, zorder=4, elinewidth=1)
+    chance_hline(ax)
+    ax.set_xlim(-0.65, 0.75)
     ax.set_ylim(0.35, 0.95)
     ax.set_xticks([])
-    ax.set_ylabel("Participant BAcc")
-    ax.set_title("Primary E01 participant-level BAcc")
-    ax.text(
-        0.02,
-        0.98,
-        f"N=102\nmean={mean:.3f}\n95% bootstrap CI [{lo:.3f}, {hi:.3f}]",
-        transform=ax.transAxes,
-        va="top",
-        fontsize=8,
-        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec=LIGHT),
-    )
+    ax.set_ylabel("Balanced accuracy")
+    ax.set_title("Participant-level performance", loc="left")
+    ax.text(0.02, 0.98, f"N={len(vals)}\nmean={mean:.3f}", transform=ax.transAxes, va="top", fontsize=7)
 
     # B
-    ax = axes[0, 1]
+    ax = axes[1]
     panel_label(ax, "B")
-    ypos = np.arange(len(models_df))
-    colors = [GRAY, "#56B4E9", CONTROL, PRIMARY]
-    ax.barh(ypos, models_df["bacc"], color=colors, edgecolor=BLACK, lw=0.5, height=0.65)
+    y = np.arange(len(models_df))
+    colors = [NEUTRAL, CONTROL, CONTROL, PRIMARY]
     ax.errorbar(
         models_df["bacc"],
-        ypos,
+        y,
         xerr=[models_df["bacc"] - models_df["ci_low"], models_df["ci_high"] - models_df["bacc"]],
         fmt="none",
         ecolor=BLACK,
-        capsize=3,
+        capsize=2.5,
+        elinewidth=1,
+        zorder=2,
     )
-    ax.axvline(0.5, color=CHANCE, ls="--", lw=1.0)
-    ax.set_yticks(ypos)
-    ax.set_yticklabels(models_df["model"])
+    ax.scatter(models_df["bacc"], y, s=36, c=colors, edgecolors=BLACK, lw=0.5, zorder=3)
+    chance_vline(ax)
+    labels = [f"{r.model}" + (" (primary)" if r.primary else "") for r in models_df.itertuples()]
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels)
+    ax.invert_yaxis()
     ax.set_xlabel("Participant-mean BAcc")
-    ax.set_xlim(0.45, 0.70)
-    ax.set_title("Model comparators (same nested CV)")
-    ax.text(0.98, 0.05, "Not a classifier leaderboard", transform=ax.transAxes, ha="right", fontsize=7, style="italic", color=GRAY)
+    ax.set_xlim(0.45, 0.68)
+    ax.set_title("Model comparators", loc="left")
 
     # C
-    ax = axes[1, 0]
+    ax = axes[2]
     panel_label(ax, "C")
-    ax.hist(null["statistic"], bins=40, color=NULL, edgecolor="white", lw=0.4)
-    ax.axvline(e07["observed_statistic"], color=VERM, lw=2.0)
+    ax.hist(null["statistic"], bins=35, color=NULL, edgecolor="white", lw=0.3, alpha=0.9)
+    ax.axvline(e07["observed_statistic"], color=PRIMARY, lw=1.6)
     ax.set_xlabel("Null participant-mean BAcc")
-    ax.set_ylabel("Count (of 1000)")
-    ax.set_title("E07 structured permutation null")
+    ax.set_ylabel("Count")
+    ax.set_title("Structured permutation", loc="left")
     ax.text(
         0.98,
-        0.95,
-        f"observed = {e07['observed_statistic']:.6f}\n"
-        f"0/1000 null ≥ observed\n"
-        f"plus-one p = {e07['p_value_plusone']:.6f}",
+        0.97,
+        f"obs={e07['observed_statistic']:.3f}\n0/1000 ≥ obs\np={e07['p_value_plusone']:.6f}",
         transform=ax.transAxes,
         ha="right",
         va="top",
-        fontsize=8,
-        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec=LIGHT),
+        fontsize=6.5,
     )
 
-    # D
-    ax = axes[1, 1]
-    panel_label(ax, "D")
-    y = np.arange(len(secondary))
-    cols = [PRIMARY if r == "primary" else GRAY for r in secondary["role"]]
-    ax.barh(y, secondary["value"], color=cols, edgecolor=BLACK, lw=0.4, height=0.65)
-    ax.set_yticks(y)
-    ax.set_yticklabels(secondary["metric"])
-    ax.set_xlabel("Value")
-    ax.set_title("Primary model secondary metrics")
-    ax.text(0.98, 0.05, "BAcc = primary endpoint;\nothers descriptive", transform=ax.transAxes, ha="right", fontsize=7, style="italic", color=GRAY)
-
-    fig.tight_layout()
+    fig.tight_layout(w_pad=1.2)
     save_figure(fig, "Figure_2_Primary_Decoding", main=True)
 
 
 # ---------------------------------------------------------------------------
-# Figure 3 — Pre-cue vs post-cue
+# Figure 3 — Pre-cue vs post-cue (3 panels)
 # ---------------------------------------------------------------------------
 
 
-def figure_3_precue_postcue() -> None:
+def figure_3() -> None:
     paired = pd.read_csv(CMP / "e00_vs_e01_participant.csv")
     boot = pd.read_csv(CMP / "e00_vs_e01_bootstrap_summary.csv").iloc[0]
     sign = load_json(CMP / "e00_vs_e01_signflip.json")
     e00_m, e00_lo, e00_hi = boot_ci(E00 / "bootstrap_summary.csv")
     e01_m, e01_lo, e01_hi = boot_ci(E01 / "erd_lr/bootstrap_summary.csv")
 
-    export_source("Figure_3B_source.csv", paired)
-    export_source(
+    delta = paired["difference_e01_minus_e00"].to_numpy()
+    n_pos = int(np.sum(delta > 0))
+    d_mean = float(boot["mean_difference"])
+    d_lo = float(boot["difference_ci_low"])
+    d_hi = float(boot["difference_ci_high"])
+    pval = float(sign["p_value_plusone"])
+
+    export_csv("Figure_3B_source.csv", paired)
+    export_csv(
         "Figure_3C_source.csv",
         paired[["subject", "difference_e01_minus_e00"]].rename(columns={"difference_e01_minus_e00": "delta_bacc"}),
     )
-    export_source_json(
+    export_json(
         "Figure_3_annotations.json",
         {
+            "n": int(len(paired)),
             "e00_mean": e00_m,
             "e00_ci": [e00_lo, e00_hi],
             "e01_mean": e01_m,
             "e01_ci": [e01_lo, e01_hi],
-            "mean_delta": float(boot["mean_difference"]),
-            "delta_ci": [float(boot["difference_ci_low"]), float(boot["difference_ci_high"])],
-            "signflip_p": sign["p_value_plusone"],
-            "n": int(sign["n_participants"]),
+            "mean_delta": d_mean,
+            "delta_ci": [d_lo, d_hi],
+            "signflip_p": pval,
+            "n_delta_gt0": n_pos,
+            "pct_delta_gt0": n_pos / len(paired),
         },
     )
 
-    fig = plt.figure(figsize=(11, 8.5))
-    gs = GridSpec(2, 2, figure=fig, hspace=0.35, wspace=0.3)
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.85), gridspec_kw={"width_ratios": [0.85, 1.15, 1.15]})
 
-    # A timeline
-    ax = fig.add_subplot(gs[0, 0])
+    # A compact schematic
+    ax = axes[0]
     panel_label(ax, "A")
-    ax.set_xlim(-2.2, 3.7)
-    ax.set_ylim(0, 3)
-    ax.set_yticks([])
-    ax.axvline(0, color=BLACK, lw=1.1)
-    ax.axvspan(-0.8375, 0.8375, color=LIGHT)
-    ax.plot([-2.0, -0.8375], [1.8, 1.8], color=PRIMARY, lw=7, solid_capstyle="butt")
-    ax.text(-1.42, 2.15, "E00: absolute μ/β power\n(FIR-safe pre-cue)", ha="center", fontsize=8, color=PRIMARY)
-    ax.plot([0.8375, 3.5], [1.2, 1.2], color=SECONDARY, lw=7, solid_capstyle="butt")
-    ax.text(2.15, 1.55, "E01: μ/β ERD vs baseline\n(FIR-safe post-cue)", ha="center", fontsize=8, color=SECONDARY)
-    ax.set_xlabel("Time (s)")
-    ax.set_title("Pre-cue vs post-cue features")
+    ax.set_xlim(0, 10)
+    ax.set_ylim(0, 6)
+    ax.axis("off")
+    ax.set_title("Analysis windows", loc="left")
+    ax.add_patch(mpatches.FancyBboxPatch((0.5, 3.6), 9, 1.5, boxstyle="round,pad=0.02", fc=CONTROL, alpha=0.35, ec=BLACK, lw=0.5))
+    ax.text(5, 4.35, "E00 — pre-cue absolute μ/β power", ha="center", va="center", fontsize=7.5)
+    ax.add_patch(mpatches.FancyBboxPatch((0.5, 1.2), 4.2, 1.5, boxstyle="round,pad=0.02", fc=LIGHT, ec=BLACK, lw=0.5))
+    ax.text(2.6, 1.95, "E01 baseline\n(pre-cue)", ha="center", va="center", fontsize=7)
+    ax.add_patch(mpatches.FancyBboxPatch((5.3, 1.2), 4.2, 1.5, boxstyle="round,pad=0.02", fc=PRIMARY, alpha=0.35, ec=BLACK, lw=0.5))
+    ax.text(7.4, 1.95, "E01 task\n(post-cue ERD)", ha="center", va="center", fontsize=7)
+    ax.text(5, 0.35, "FIR-safe windows", ha="center", fontsize=6.5, style="italic", color=GRAY)
 
-    # B paired summary (avoid spaghetti): twin distributions + mean bars
-    ax = fig.add_subplot(gs[0, 1])
+    # B distributions
+    ax = axes[1]
     panel_label(ax, "B")
-    data = [paired["e00"], paired["e01"]]
-    parts = ax.violinplot(data, positions=[0, 1], showextrema=False, widths=0.7)
-    for i, b in enumerate(parts["bodies"]):
-        b.set_facecolor([PRIMARY, SECONDARY][i])
-        b.set_alpha(0.3)
+    e00 = paired["e00"].to_numpy()
+    e01 = paired["e01"].to_numpy()
+    data = [e00, e01]
+    parts = ax.violinplot(data, positions=[0, 1], showmeans=False, showextrema=False, widths=0.7)
+    for b, col in zip(parts["bodies"], [CONTROL, PRIMARY]):
+        b.set_facecolor(col)
+        b.set_alpha(0.25)
+        b.set_edgecolor(col)
     rng = np.random.default_rng(7)
-    for i, col in enumerate(["e00", "e01"]):
-        y = paired[col].to_numpy()
-        x = i + 0.04 * rng.standard_normal(len(y))
-        ax.scatter(x, y, s=8, c=[PRIMARY, SECONDARY][i], alpha=0.35, edgecolors="none")
-    ax.errorbar(0, e00_m, yerr=[[e00_m - e00_lo], [e00_hi - e00_m]], fmt="o", color=BLACK, ms=6, capsize=4)
-    ax.errorbar(1, e01_m, yerr=[[e01_m - e01_lo], [e01_hi - e01_m]], fmt="o", color=BLACK, ms=6, capsize=4)
-    chance_line(ax)
+    for i, (arr, col) in enumerate(zip(data, [CONTROL, PRIMARY])):
+        ax.scatter(i + 0.04 * rng.standard_normal(len(arr)), arr, s=7, c=col, alpha=0.45, edgecolors="none", zorder=3)
+    ax.errorbar(0, e00_m, yerr=[[e00_m - e00_lo], [e00_hi - e00_m]], fmt="o", color=BLACK, ms=4.5, capsize=2.5, zorder=4)
+    ax.errorbar(1, e01_m, yerr=[[e01_m - e01_lo], [e01_hi - e01_m]], fmt="o", color=BLACK, ms=4.5, capsize=2.5, zorder=4)
+    chance_hline(ax)
     ax.set_xticks([0, 1])
     ax.set_xticklabels([f"E00\n{e00_m:.3f}", f"E01\n{e01_m:.3f}"])
-    ax.set_ylabel("Participant BAcc")
+    ax.set_ylabel("Balanced accuracy")
     ax.set_ylim(0.35, 0.95)
-    ax.set_title(f"Paired common N={len(paired)}")
+    ax.set_title("E00 vs E01", loc="left")
 
-    # C deltas
-    ax = fig.add_subplot(gs[1, :])
-    panel_label(ax, "C", x=-0.02)
-    d = paired["difference_e01_minus_e00"].to_numpy()
-    order = np.argsort(d)
-    ax.axhline(0, color=CHANCE, ls="--", lw=1)
-    ax.scatter(np.arange(len(d)), d[order], s=14, c=np.where(d[order] >= 0, SECONDARY, PRIMARY), alpha=0.75, edgecolors="none")
-    mean_d = float(boot["mean_difference"])
-    lo = float(boot["difference_ci_low"])
-    hi = float(boot["difference_ci_high"])
-    ax.axhline(mean_d, color=BLACK, lw=1.2)
-    ax.fill_between([-2, len(d) + 2], lo, hi, color=LIGHT, alpha=0.8, zorder=0)
-    ax.set_xlim(-1, len(d))
-    ax.set_xlabel("Participants (sorted by ΔBAcc)")
-    ax.set_ylabel("E01 − E00 BAcc")
-    ax.set_title("Participant-level post-cue advantage")
+    # C delta
+    ax = axes[2]
+    panel_label(ax, "C")
+    parts = ax.violinplot(delta, positions=[0], showmeans=False, showextrema=False, widths=0.7)
+    for b in parts["bodies"]:
+        b.set_facecolor(PRIMARY)
+        b.set_alpha(0.22)
+        b.set_edgecolor(PRIMARY)
+    ax.scatter(0.04 * rng.standard_normal(len(delta)), delta, s=8, c=PRIMARY, alpha=0.5, edgecolors="none", zorder=3)
+    ax.errorbar(0.4, d_mean, yerr=[[d_mean - d_lo], [d_hi - d_mean]], fmt="o", color=BLACK, ms=5, capsize=3, zorder=4)
+    ax.axhline(0, color=CHANCE, ls="--", lw=0.9)
+    ax.set_xticks([])
+    ax.set_ylabel("ΔBAcc (E01 − E00)")
+    ax.set_title("Participant ΔBAcc", loc="left")
     ax.text(
-        0.01,
-        0.97,
-        f"mean Δ = {mean_d:.3f}; 95% bootstrap CI [{lo:.3f}, {hi:.3f}]\n"
-        f"paired sign-flip plus-one p = {sign['p_value_plusone']:.6f}",
+        0.98,
+        0.98,
+        f"mean={d_mean:.3f}\n{n_pos}/{len(delta)} Δ>0\np={pval:.4f}",
         transform=ax.transAxes,
+        ha="right",
         va="top",
-        fontsize=8,
-        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec=LIGHT),
+        fontsize=6.5,
     )
 
-    fig.tight_layout()
+    fig.tight_layout(w_pad=1.0)
     save_figure(fig, "Figure_3_PreCue_PostCue", main=True)
 
 
 # ---------------------------------------------------------------------------
-# Figure 4 — Physiology + spatial
+# Figure 4 — Physiology and spatial (former Fig4 A–C)
+# Figure 5 — Robustness and protocol state (former Fig4 D)
 # ---------------------------------------------------------------------------
 
 
-def _channel_xy(channels: list[str]):
-    import mne
-
-    mont = mne.channels.make_standard_montage("standard_1005")
-    pos = mont.get_positions()["ch_pos"]
-    xy = []
-    for ch in channels:
-        if ch not in pos:
-            raise KeyError(ch)
-        p = pos[ch]
-        xy.append([p[0], p[1]])
-    return np.asarray(xy, float)
-
-
-def figure_4_physiology_spatial() -> None:
-    from eeg_me_mi.protocol import SENSORIMOTOR_CHANNELS
-    from eeg_me_mi.rois import ROI_LEFT, ROI_MIDLINE, ROI_RIGHT, SPATIAL_CONTROL_CHANNELS
-
-    roi = pd.read_csv(E03 / "roi_summary.csv")
-    ch = pd.read_csv(E03 / "channel_summary_fdr.csv")
-    spat = load_json(E05 / "spatial_control/paired_effect_summary.json")
-    spat_boot = pd.read_csv(E05 / "spatial_control/bootstrap_summary.csv").iloc[0]
-    paired = pd.read_csv(E05 / "spatial_control/paired_participant_differences.csv")
-    sm_mean = float(paired["bacc_sm"].mean())
-    sc_mean = float(paired["bacc_sc"].mean())
-
-    mov_rows = []
-    for key, label in [
-        ("left_fist", "Left fist"),
-        ("right_fist", "Right fist"),
-        ("both_fists", "Both fists"),
-        ("both_feet", "Both feet"),
-        ("unilateral", "Unilateral"),
-        ("bilateral", "Bilateral"),
-    ]:
-        m, lo, hi = boot_ci(E02 / key / "bootstrap_summary.csv")
-        n = int(load_json(E02 / key / "summary.json")["n_participants"])
-        mov_rows.append({"movement": label, "key": key, "n": n, "bacc": m, "ci_low": lo, "ci_high": hi})
-    mov_df = pd.DataFrame(mov_rows)
-
-    export_source("Figure_4B_source.csv", roi)
-    export_source("Figure_4C_source.csv", ch[["band", "channel", "mean", "p_fdr", "reject_fdr"]])
-    export_source("Figure_4D_source.csv", mov_df)
-    export_source("Figure_4E_source.csv", paired)
-    export_source_json(
-        "Figure_4E_annotations.json",
-        {
-            "spatial_n": int(spat_boot["n_participants"]),
-            "spatial_bacc": float(spat_boot["mean"]),
-            "spatial_ci": [float(spat_boot["ci_low"]), float(spat_boot["ci_high"])],
-            "paired_n": spat["common_n"],
-            "mean_sm_minus_sc": spat["mean_difference_sm_minus_sc"],
-            "paired_ci": [spat["bootstrap_ci_low"], spat["bootstrap_ci_high"]],
-            "paired_sm_mean": sm_mean,
-            "paired_sc_mean": sc_mean,
-            "formal_p": False,
-        },
-    )
-
-    fig = plt.figure(figsize=(12, 10))
-    gs = GridSpec(3, 2, figure=fig, height_ratios=[1.05, 1.0, 1.0], hspace=0.4, wspace=0.3)
-
-    # A map
-    ax = fig.add_subplot(gs[0, 0])
-    panel_label(ax, "A")
-    xy = _channel_xy(list(SENSORIMOTOR_CHANNELS))
-    colors = []
-    for c in SENSORIMOTOR_CHANNELS:
-        if c in ROI_LEFT:
-            colors.append(PRIMARY)
-        elif c in ROI_RIGHT:
-            colors.append(SECONDARY)
-        elif c in ROI_MIDLINE:
-            colors.append(CONTROL)
-        else:
-            colors.append(GRAY)
-    ax.scatter(xy[:, 0], xy[:, 1], c=colors, s=55, edgecolors=BLACK, lw=0.5, zorder=3)
-    # head outline
-    circle = plt.Circle((0, 0), 0.12, fill=False, color=GRAY, lw=1)
-    ax.add_patch(circle)
-    ax.set_aspect("equal")
-    ax.axis("off")
-    ax.set_title("21 sensorimotor channels (prespecified ROIs)")
-    ax.legend(
-        handles=[
-            mpatches.Patch(color=PRIMARY, label="Left ROI"),
-            mpatches.Patch(color=CONTROL, label="Midline ROI"),
-            mpatches.Patch(color=SECONDARY, label="Right ROI"),
-        ],
-        loc="lower center",
-        ncol=3,
-        frameon=False,
-        fontsize=7,
-    )
-    ax.text(0.5, -0.05, "Scalp layout; not source localization", transform=ax.transAxes, ha="center", fontsize=7, style="italic", color=GRAY)
-
-    # B ROI effects
-    ax = fig.add_subplot(gs[0, 1])
-    panel_label(ax, "B")
-    order = [
-        ("mu", "left_sensorimotor"),
-        ("mu", "midline"),
-        ("mu", "right_sensorimotor"),
-        ("beta", "left_sensorimotor"),
-        ("beta", "midline"),
-        ("beta", "right_sensorimotor"),
-    ]
-    ys, means, los, his, labs = [], [], [], [], []
-    for i, (band, rname) in enumerate(order):
-        row = roi.loc[(roi.band == band) & (roi.roi == rname)].iloc[0]
-        ys.append(i)
-        means.append(float(row["mean"]))
-        los.append(float(row["mean_bootstrap_ci_low"]))
-        his.append(float(row["mean_bootstrap_ci_high"]))
-        labs.append(f"{band} {rname.replace('_sensorimotor','')}")
-        mark = "*" if bool(row["reject_fdr"]) else ""
-        ax.text(float(row["mean_bootstrap_ci_high"]) + 0.05, i, mark, va="center", fontsize=10, color=BLACK)
-    ax.errorbar(means, ys, xerr=[np.array(means) - np.array(los), np.array(his) - np.array(means)], fmt="o", color=PRIMARY, ms=5, capsize=3)
-    ax.axvline(0, color=CHANCE, ls="--", lw=1)
-    ax.set_yticks(ys)
-    ax.set_yticklabels(labs)
-    ax.set_xlabel("ME − MI ERD (dB); negative = stronger ME ERD")
-    ax.set_title("Prespecified ROI effects (FDR *)")
-
-    # C topomaps mu/beta
-    ax1 = fig.add_subplot(gs[1, 0])
-    ax2 = fig.add_subplot(gs[1, 1])
-    panel_label(ax1, "C")
-    panel_label(ax2, " ")
-    import mne
-
-    info = mne.create_info(list(SENSORIMOTOR_CHANNELS), 80.0, ch_types="eeg")
-    info.set_montage("standard_1005", on_missing="ignore")
-    for ax, band, title in ((ax1, "mu", "μ ME−MI (dB)"), (ax2, "beta", "β ME−MI (dB)")):
-        sub = ch.loc[ch.band == band].set_index("channel")
-        data = np.array([float(sub.loc[c, "mean"]) for c in SENSORIMOTOR_CHANNELS])
-        im, _ = mne.viz.plot_topomap(data, info, axes=ax, show=False, cmap="RdBu_r", contours=0, sensors=True)
-        ax.set_title(title)
-    fig.colorbar(im, ax=[ax1, ax2], fraction=0.03, pad=0.02, label="ME − MI (dB)")
-    ax1.text(0.5, -0.12, "Channel-level supporting maps; not cortical activation maps", transform=ax1.transAxes, ha="center", fontsize=7, style="italic", color=GRAY)
-
-    # D movements
-    ax = fig.add_subplot(gs[2, 0])
-    panel_label(ax, "D")
-    y = np.arange(len(mov_df))
-    ax.barh(y, mov_df["bacc"], color=PRIMARY, edgecolor=BLACK, lw=0.4, height=0.65, alpha=0.85)
-    ax.errorbar(mov_df["bacc"], y, xerr=[mov_df["bacc"] - mov_df["ci_low"], mov_df["ci_high"] - mov_df["bacc"]], fmt="none", ecolor=BLACK, capsize=3)
-    ax.axvline(0.5, color=CHANCE, ls="--", lw=1)
-    ax.set_yticks(y)
-    ax.set_yticklabels([f"{r.movement} (N={r.n})" for r in mov_df.itertuples()])
-    ax.set_xlabel("Participant-mean BAcc")
-    ax.set_xlim(0.45, 0.70)
-    ax.set_title("Movement-specific decoding")
-
-    # E spatial control — means from frozen paired CSV; SC CI from frozen spatial bootstrap;
-    # paired Δ CI from frozen paired_effect_summary (no new inference / no confirmatory p).
-    ax = fig.add_subplot(gs[2, 1])
-    panel_label(ax, "E")
-    labels = ["Sensorimotor\n(paired N=77)", "Peripheral/\nnon-sensorimotor"]
-    means = [sm_mean, sc_mean]
-    ax.bar([0, 1], means, color=[PRIMARY, SECONDARY], edgecolor=BLACK, lw=0.5, width=0.65)
-    # Error bar only for SC cohort mean (frozen). SM paired mean has no separate frozen CI.
-    ax.errorbar(
-        [1],
-        [sc_mean],
-        yerr=[[sc_mean - float(spat_boot["ci_low"])], [float(spat_boot["ci_high"]) - sc_mean]],
-        fmt="none",
-        ecolor=BLACK,
-        capsize=4,
-    )
-    ax.axhline(0.5, color=CHANCE, ls="--", lw=1)
-    ax.set_xticks([0, 1])
-    ax.set_xticklabels(labels)
-    ax.set_ylabel("Participant-mean BAcc")
-    ax.set_ylim(0.45, 0.70)
-    ax.set_title("Spatial representation control")
-    ax.text(
-        0.98,
-        0.05,
-        f"paired N={spat['common_n']}\n"
-        f"mean SM−SC Δ={spat['mean_difference_sm_minus_sc']:.3f}\n"
-        f"95% CI [{spat['bootstrap_ci_low']:.3f}, {spat['bootstrap_ci_high']:.3f}]\n"
-        f"(no confirmatory paired p)",
-        transform=ax.transAxes,
-        ha="right",
-        va="bottom",
-        fontsize=7,
-        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec=LIGHT),
-    )
-
-    fig.subplots_adjust(hspace=0.45, wspace=0.35)
-    save_figure(fig, "Figure_4_Physiology_Spatial", main=True)
-
-
-# ---------------------------------------------------------------------------
-# Figure 5 — Robustness + protocol
-# ---------------------------------------------------------------------------
-
-
-def figure_5_robustness() -> None:
-    thr_rows = []
-    for key, label in [("none", "No rejection"), ("150uv", "150 µV"), ("200uv", "200 µV (primary)")]:
-        s = load_json(E05 / f"artifact_sensitivity/{key}/summary.json")
+def _robustness_table() -> tuple[pd.DataFrame, float]:
+    rob_rows = []
+    prim_m, prim_lo, prim_hi = boot_ci(E01 / "erd_lr/bootstrap_summary.csv")
+    rob_rows.append({"analysis": "Primary", "n": 102, "bacc": prim_m, "ci_low": prim_lo, "ci_high": prim_hi})
+    for key, label in [("none", "No rejection"), ("150uv", "150 µV"), ("200uv", "200 µV")]:
         m, lo, hi = boot_ci(E05 / f"artifact_sensitivity/{key}/bootstrap_summary.csv")
-        thr_rows.append({"threshold": label, "n": int(s["n_participants"]), "bacc": m, "ci_low": lo, "ci_high": hi})
-    thr = pd.DataFrame(thr_rows)
-
+        n = int(load_json(E05 / f"artifact_sensitivity/{key}/summary.json")["n_participants"])
+        rob_rows.append({"analysis": label, "n": n, "bacc": m, "ci_low": lo, "ci_high": hi})
     sens = pd.read_csv(REV / "sensitivity_summary.csv")
-    samp = load_json(SENS / "sampling_rate/sampling_rate_sensitivity_summary.json")
-    # build compact robustness table
-    rob = [
-        {"analysis": "Primary E01", "n": 102, "bacc": samp["primary_bacc"], "ci_low": samp["primary_ci"][0], "ci_high": samp["primary_ci"][1]},
-    ]
-    for _, r in sens.iterrows():
-        if r["analysis"] == "E01_primary":
-            continue
-        if r["analysis"] == "E01_sampling_rate_sensitivity":
-            continue
-        rob.append(
+    for analysis, label in [
+        ("E01_strict", "Strict cohort"),
+        ("E06_first60", "First 60 s"),
+        ("E06_all_events", "All events"),
+    ]:
+        r = sens.loc[sens.analysis == analysis].iloc[0]
+        rob_rows.append(
             {
-                "analysis": str(r["analysis"]),
-                "n": int(r["n"]) if pd.notna(r["n"]) else None,
-                "bacc": float(r["bacc"]) if pd.notna(r["bacc"]) else None,
-                "ci_low": float(r["ci_low"]) if pd.notna(r["ci_low"]) else None,
-                "ci_high": float(r["ci_high"]) if pd.notna(r["ci_high"]) else None,
+                "analysis": label,
+                "n": int(r["n"]),
+                "bacc": float(r["bacc"]),
+                "ci_low": float(r["ci_low"]),
+                "ci_high": float(r["ci_high"]),
             }
         )
-    rob.append(
+    samp = load_json(SENS / "sampling_rate/sampling_rate_sensitivity_summary.json")
+    rob_rows.append(
         {
-            "analysis": "Sampling-rate (excl. S088/092/100)",
+            "analysis": "Sampling-rate",
             "n": samp["sensitivity_n"],
             "bacc": samp["sensitivity_bacc"],
             "ci_low": samp["sensitivity_ci"][0],
             "ci_high": samp["sensitivity_ci"][1],
         }
     )
-    rob_df = pd.DataFrame(rob)
+    return pd.DataFrame(rob_rows), prim_m
 
-    rej = load_json(SENS / "rejection_audit/rejection_audit_summary.json")
-    pairs = pd.read_csv(REV / "e08_matched_pairs.csv")
 
-    export_source("Figure_5A_source.csv", thr)
-    export_source("Figure_5B_source.csv", rob_df)
-    export_source_json(
-        "Figure_5C_source.json",
+def figure_4() -> None:
+    """Physiology + spatial: A/B unchanged style; C as C1+C2 (clear paired Δ)."""
+    from eeg_me_mi.protocol import SENSORIMOTOR_CHANNELS
+
+    roi = pd.read_csv(E03 / "roi_summary.csv")
+    ch = pd.read_csv(E03 / "channel_summary_fdr.csv")
+    spat = load_json(E05 / "spatial_control/paired_effect_summary.json")
+    spat_boot = pd.read_csv(E05 / "spatial_control/bootstrap_summary.csv")
+    spat_boot_row = (
+        spat_boot.loc[spat_boot["metric"] == "balanced_accuracy"].iloc[0]
+        if "metric" in spat_boot.columns
+        else spat_boot.iloc[0]
+    )
+    paired = pd.read_csv(E05 / "spatial_control/paired_participant_differences.csv")
+    mean_d = float(spat["mean_difference_sm_minus_sc"])
+    ci_lo = float(spat["bootstrap_ci_low"])
+    ci_hi = float(spat["bootstrap_ci_high"])
+    n_paired = int(spat["common_n"])
+
+    export_csv("Figure_4A_source.csv", roi)
+    export_csv("Figure_4B_source.csv", ch[["band", "channel", "mean", "p_fdr", "reject_fdr"]])
+    export_csv("Figure_4C_source.csv", paired)
+    export_json(
+        "Figure_4_annotations.json",
         {
-            "primary_cohort": rej["primary_cohort"],
-            "participant_paired": rej["participant_paired"],
+            "spatial_n": int(spat_boot_row["n_participants"]) if "n_participants" in spat_boot_row else 78,
+            "spatial_bacc": float(spat_boot_row["mean"]),
+            "spatial_ci": [float(spat_boot_row["ci_low"]), float(spat_boot_row["ci_high"])],
+            "paired_n": n_paired,
+            "mean_sm_minus_sc": mean_d,
+            "paired_ci": [ci_lo, ci_hi],
+            "formal_p": False,
         },
     )
-    export_source("Figure_5E_source.csv", pairs)
 
-    fig = plt.figure(figsize=(12, 10))
-    gs = GridSpec(3, 2, figure=fig, hspace=0.4, wspace=0.3)
+    fig = plt.figure(figsize=(7.2, 6.8))
+    outer = GridSpec(2, 2, figure=fig, height_ratios=[1.0, 1.2], hspace=0.42, wspace=0.35)
 
-    # A thresholds
-    ax = fig.add_subplot(gs[0, 0])
+    # A forest ROI (unchanged style)
+    ax = fig.add_subplot(outer[0, 0])
     panel_label(ax, "A")
-    x = np.arange(len(thr))
-    ax.bar(x, thr["bacc"], color=[CONTROL, "#56B4E9", PRIMARY], edgecolor=BLACK, lw=0.5, width=0.65)
-    ax.errorbar(x, thr["bacc"], yerr=[thr["bacc"] - thr["ci_low"], thr["ci_high"] - thr["bacc"]], fmt="none", ecolor=BLACK, capsize=4)
-    ax.axhline(0.5, color=CHANCE, ls="--", lw=1)
-    ax.set_xticks(x)
-    ax.set_xticklabels([f"{r.threshold}\nN={r.n}" for r in thr.itertuples()], fontsize=7)
-    ax.set_ylim(0.45, 0.70)
-    ax.set_ylabel("Participant-mean BAcc")
-    ax.set_title("Artifact-threshold sensitivity")
+    order = [
+        ("mu", "left_sensorimotor", "μ left"),
+        ("mu", "midline", "μ midline"),
+        ("mu", "right_sensorimotor", "μ right"),
+        ("beta", "left_sensorimotor", "β left"),
+        ("beta", "midline", "β midline"),
+        ("beta", "right_sensorimotor", "β right"),
+    ]
+    ys, means, los, his, colors = [], [], [], [], []
+    for i, (band, rname, lab) in enumerate(order):
+        row = roi.loc[(roi.band == band) & (roi.roi == rname)].iloc[0]
+        ys.append(i)
+        means.append(float(row["mean"]))
+        los.append(float(row["mean_bootstrap_ci_low"]))
+        his.append(float(row["mean_bootstrap_ci_high"]))
+        colors.append(MU if band == "mu" else BETA)
+    ax.errorbar(
+        means,
+        ys,
+        xerr=[np.array(means) - np.array(los), np.array(his) - np.array(means)],
+        fmt="o",
+        color=BLACK,
+        ecolor=BLACK,
+        ms=0,
+        capsize=2.5,
+        elinewidth=1,
+        zorder=2,
+    )
+    ax.scatter(means, ys, c=colors, s=28, edgecolors=BLACK, lw=0.4, zorder=3)
+    ax.axvline(0, color=CHANCE, ls="--", lw=0.9)
+    ax.set_yticks(ys)
+    ax.set_yticklabels([o[2] for o in order])
+    ax.invert_yaxis()
+    ax.set_xlabel("ME − MI ERD (dB)")
+    ax.set_title("ROI ERD effects", loc="left")
+    ax.text(0.98, 0.02, "FDR q<0.05 (all)", transform=ax.transAxes, ha="right", va="bottom", fontsize=6, color=GRAY)
 
-    # B other sensitivities
-    ax = fig.add_subplot(gs[0, 1])
-    panel_label(ax, "B")
-    y = np.arange(len(rob_df))
-    ax.barh(y, rob_df["bacc"], color=PRIMARY, edgecolor=BLACK, lw=0.4, height=0.65, alpha=0.85)
-    for i, r in rob_df.iterrows():
-        if pd.notna(r["ci_low"]):
-            ax.plot([r["ci_low"], r["ci_high"]], [i, i], color=BLACK, lw=1)
-    ax.axvline(0.5, color=CHANCE, ls="--", lw=1)
-    ax.axvline(samp["primary_bacc"], color=VERM, ls=":", lw=1.2)
-    ax.set_yticks(y)
-    ax.set_yticklabels([f"{r.analysis} (N={r.n})" for r in rob_df.itertuples()], fontsize=7)
-    ax.set_xlabel("Participant-mean BAcc")
-    ax.set_xlim(0.45, 0.70)
-    ax.set_title("Other sensitivity analyses")
+    # B topomaps (unchanged style)
+    gs_b = outer[0, 1].subgridspec(1, 3, width_ratios=[1, 1, 0.08], wspace=0.15)
+    ax_mu = fig.add_subplot(gs_b[0, 0])
+    ax_beta = fig.add_subplot(gs_b[0, 1])
+    cax = fig.add_subplot(gs_b[0, 2])
+    panel_label(ax_mu, "B")
+    import mne
 
-    # C rejection
-    ax = fig.add_subplot(gs[1, 0])
-    panel_label(ax, "C")
-    me = rej["primary_cohort"]["ME"]
-    mi = rej["primary_cohort"]["MI"]
-    ax.bar([0, 1], [me["rejection_proportion"] * 100, mi["rejection_proportion"] * 100], color=[PRIMARY, SECONDARY], edgecolor=BLACK, width=0.6)
-    ax.set_xticks([0, 1])
-    ax.set_xticklabels(["ME", "MI"])
-    ax.set_ylabel("Rejection proportion (%)")
-    ax.set_title("Label-specific 200 µV rejection (primary cohort)")
-    pp = rej["participant_paired"]
-    ax.text(
+    info = mne.create_info(list(SENSORIMOTOR_CHANNELS), 80.0, ch_types="eeg")
+    info.set_montage("standard_1005", on_missing="ignore")
+    vmax = float(np.nanmax(np.abs(ch["mean"].to_numpy())))
+    im = None
+    for ax_t, band, title in ((ax_mu, "mu", "μ"), (ax_beta, "beta", "β")):
+        sub = ch.loc[ch.band == band].set_index("channel")
+        data = np.array([float(sub.loc[c, "mean"]) for c in SENSORIMOTOR_CHANNELS])
+        im, _ = mne.viz.plot_topomap(
+            data,
+            info,
+            axes=ax_t,
+            show=False,
+            cmap="RdBu_r",
+            vlim=(-vmax, vmax),
+            contours=0,
+            sensors=True,
+            names=None,
+        )
+        ax_t.set_title(title, fontsize=8)
+    cb = fig.colorbar(im, cax=cax)
+    cb.set_label("dB", fontsize=6)
+    cb.ax.tick_params(labelsize=5)
+    ax_mu.set_xlabel("Scalp ME−MI (sensor-space)", fontsize=6.5)
+
+    # C1 / C2 as clear sibling subpanels
+    gs_c = outer[1, :].subgridspec(1, 2, wspace=0.35, width_ratios=[1.0, 1.05])
+    ax_c1 = fig.add_subplot(gs_c[0, 0])
+    ax_c2 = fig.add_subplot(gs_c[0, 1])
+
+    sm = paired["bacc_sm"].to_numpy()
+    sc = paired["bacc_sc"].to_numpy()
+    dlt = paired["difference_sm_minus_sc"].to_numpy()
+    rng = np.random.default_rng(11)
+
+    # C1 — marginal distributions
+    panel_label(ax_c1, "C")
+    parts = ax_c1.violinplot([sm, sc], positions=[0, 1], showmeans=False, showextrema=False, widths=0.65)
+    for b, col in zip(parts["bodies"], [PRIMARY, NEUTRAL]):
+        b.set_facecolor(col)
+        b.set_alpha(0.25)
+        b.set_edgecolor(col)
+    ax_c1.scatter(0 + 0.04 * rng.standard_normal(len(sm)), sm, s=8, c=PRIMARY, alpha=0.45, edgecolors="none")
+    ax_c1.scatter(1 + 0.04 * rng.standard_normal(len(sc)), sc, s=8, c=NEUTRAL, alpha=0.45, edgecolors="none")
+    chance_hline(ax_c1)
+    ax_c1.set_xticks([0, 1])
+    ax_c1.set_xticklabels(["Sensorimotor", "Peripheral\ncontrol"])
+    ax_c1.set_ylabel("Balanced accuracy")
+    ax_c1.set_ylim(0.35, 0.90)
+    ax_c1.set_title(f"Spatial control distributions (N={n_paired})", loc="left")
+
+    # C2 — paired Δ distribution (explicit)
+    parts = ax_c2.violinplot(dlt, positions=[0], showmeans=False, showextrema=False, widths=0.7)
+    for b in parts["bodies"]:
+        b.set_facecolor(PRIMARY)
+        b.set_alpha(0.22)
+        b.set_edgecolor(PRIMARY)
+    ax_c2.scatter(0.04 * rng.standard_normal(len(dlt)), dlt, s=9, c=PRIMARY, alpha=0.5, edgecolors="none", zorder=3)
+    ax_c2.errorbar(
+        0.42,
+        mean_d,
+        yerr=[[mean_d - ci_lo], [ci_hi - mean_d]],
+        fmt="o",
+        color=BLACK,
+        ms=5,
+        capsize=3,
+        zorder=4,
+    )
+    ax_c2.axhline(0, color=CHANCE, ls="--", lw=0.9)
+    ax_c2.set_xticks([])
+    ax_c2.set_ylabel("ΔBAcc")
+    ax_c2.set_title("Paired ΔBAcc (sensorimotor − peripheral)", loc="left")
+    ax_c2.text(
         0.98,
-        0.95,
-        f"retained ME={me['epochs_retained']:,}\nretained MI={mi['epochs_retained']:,}\n"
-        f"epoch ME−MI rej = {rej['primary_cohort']['absolute_difference_me_minus_mi']*100:.2f} pp\n"
-        f"participant mean Δ = {pp['mean_me_minus_mi']*100:.2f} pp\n"
-        f"95% bootstrap CI [{pp['bootstrap_ci_low']*100:.2f}, {pp['bootstrap_ci_high']*100:.2f}] pp",
-        transform=ax.transAxes,
+        0.98,
+        f"N={n_paired}\nmean Δ={mean_d:.3f}\n95% CI [{ci_lo:.3f}, {ci_hi:.3f}]",
+        transform=ax_c2.transAxes,
         ha="right",
         va="top",
         fontsize=7,
-        bbox=dict(boxstyle="round,pad=0.25", fc="white", ec=LIGHT),
     )
 
-    # D fixed order schematic
-    ax = fig.add_subplot(gs[1, 1])
-    panel_label(ax, "D")
-    ax.set_xlim(0, 10)
-    ax.set_ylim(0, 6)
-    ax.axis("off")
-    ax.set_title("Fixed matched-pair run order")
-    for i, row in pairs.iterrows():
-        y = 5.2 - i * 0.75
-        ax.add_patch(mpatches.FancyBboxPatch((1.5, y - 0.25), 2.2, 0.5, boxstyle="round,pad=0.02", fc=PRIMARY, ec=BLACK, lw=0.5))
-        ax.text(2.6, y, f"ME R{int(row.me_run)}", ha="center", va="center", color="white", fontsize=8)
-        ax.annotate("", xy=(4.6, y), xytext=(3.8, y), arrowprops=dict(arrowstyle="->", color=BLACK))
-        ax.add_patch(mpatches.FancyBboxPatch((4.7, y - 0.25), 2.2, 0.5, boxstyle="round,pad=0.02", fc=SECONDARY, ec=BLACK, lw=0.5))
-        ax.text(5.8, y, f"MI R{int(row.mi_run)}", ha="center", va="center", color="white", fontsize=8)
-        ax.text(8.2, y, f"pair {row.pair_id}", va="center", fontsize=7, color=GRAY)
-    ax.text(0.5, 0.3, "Diagnostic context for E08 — does not remove fixed-order confounding.", fontsize=7, style="italic", color=VERM)
+    ax_c1.text(0.02, 0.98, "C1", transform=ax_c1.transAxes, fontsize=8, fontweight="bold", va="top", ha="left", color=GRAY)
+    ax_c2.text(0.02, 0.98, "C2", transform=ax_c2.transAxes, fontsize=8, fontweight="bold", va="top", ha="left", color=GRAY)
 
-    # E E08 matched pair precue beta
-    ax = fig.add_subplot(gs[2, :])
-    panel_label(ax, "E", x=-0.02)
+    save_figure(fig, "Figure_4_Physiology_Spatial", main=True)
+
+
+def figure_5() -> None:
+    """Robustness forest + enlarged protocol-state diagnostic (separate canvas)."""
+    rob, prim_m = _robustness_table()
+    pairs = pd.read_csv(REV / "e08_matched_pairs.csv").copy()
+    pairs["precue_beta_me_uv2"] = pairs["precue_beta_me"] * V2_TO_UV2
+    pairs["precue_beta_mi_uv2"] = pairs["precue_beta_mi"] * V2_TO_UV2
+    pairs["delta_beta_uv2"] = pairs["precue_beta_me_uv2"] - pairs["precue_beta_mi_uv2"]
+
+    export_csv("Figure_5A_robustness_source.csv", rob)
+    export_csv("Figure_5B_e08_source.csv", pairs)
+    export_json(
+        "Figure_5_annotations.json",
+        {
+            "primary_bacc": prim_m,
+            "v2_to_uv2": V2_TO_UV2,
+            "unit_note": "Pre-cue β displayed as µV² via exact V²×1e12 conversion",
+        },
+    )
+
+    # Stacked layout: give protocol-state substantially more vertical space
+    fig = plt.figure(figsize=(7.2, 6.0))
+    gs = GridSpec(2, 1, figure=fig, height_ratios=[1.0, 1.35], hspace=0.38)
+
+    ax_rob = fig.add_subplot(gs[0, 0])
+    panel_label(ax_rob, "A")
+    y = np.arange(len(rob))
+    ax_rob.errorbar(
+        rob["bacc"],
+        y,
+        xerr=[rob["bacc"] - rob["ci_low"], rob["ci_high"] - rob["bacc"]],
+        fmt="o",
+        color=PRIMARY,
+        ecolor=BLACK,
+        ms=4.5,
+        capsize=2.5,
+        elinewidth=0.9,
+    )
+    chance_vline(ax_rob)
+    ax_rob.axvline(prim_m, color=GRAY, ls=":", lw=0.8)
+    ax_rob.set_yticks(y)
+    ax_rob.set_yticklabels([f"{r.analysis} (N={r.n})" for r in rob.itertuples()], fontsize=7)
+    ax_rob.invert_yaxis()
+    ax_rob.set_xlabel("BAcc")
+    ax_rob.set_xlim(0.58, 0.65)
+    ax_rob.set_title("Sensitivity estimates", loc="left")
+
+    ax_e08 = fig.add_subplot(gs[1, 0])
+    panel_label(ax_e08, "B")
     x = np.arange(len(pairs))
-    w = 0.35
-    ax.bar(x - w / 2, pairs["precue_beta_me"], width=w, color=PRIMARY, edgecolor=BLACK, lw=0.4, label="ME")
-    ax.bar(x + w / 2, pairs["precue_beta_mi"], width=w, color=SECONDARY, edgecolor=BLACK, lw=0.4, label="MI")
-    ax.set_xticks(x)
-    ax.set_xticklabels([f"{p}" for p in pairs["pair_id"]])
-    ax.set_ylabel("Pre-cue β power (frozen E08 mean)")
-    ax.set_xlabel("Matched ME–MI pair")
-    ax.set_title("Pre-cue run-state diagnostic (matched pairs)")
-    ax.legend(frameon=False, loc="upper right")
-    ax.text(0.01, 0.97, "Diagnostic — does not remove fixed-order confounding.", transform=ax.transAxes, va="top", fontsize=8, style="italic", color=VERM)
+    w = 0.36
+    ax_e08.bar(x - w / 2, pairs["precue_beta_me_uv2"], width=w, color=ME, edgecolor=BLACK, lw=0.4, label="ME")
+    ax_e08.bar(x + w / 2, pairs["precue_beta_mi_uv2"], width=w, color=MI, edgecolor=BLACK, lw=0.4, label="MI")
+    ax_e08.set_xticks(x)
+    ax_e08.set_xticklabels([str(p).replace("-", "–") for p in pairs["pair_id"]], fontsize=8)
+    ax_e08.set_xlabel("Matched ME→MI run pair")
+    ax_e08.set_ylabel("Pre-cue beta power (µV²)")
+    ax_e08.legend(frameon=False, fontsize=8, loc="upper right", ncol=2)
+    ax_e08.set_title("Fixed-order protocol-state diagnostic", loc="left")
+    ax_e08.set_ylim(0, max(pairs["precue_beta_me_uv2"].max(), pairs["precue_beta_mi_uv2"].max()) * 1.18)
 
-    fig.subplots_adjust(hspace=0.45, wspace=0.3)
     save_figure(fig, "Figure_5_Robustness_Protocol", main=True)
 
 
 # ---------------------------------------------------------------------------
-# Supplementary figures (selected)
+# Supplementary
 # ---------------------------------------------------------------------------
 
 
-def figure_s2_secondary_metrics_tablefig() -> None:
-    """Compact secondary-metric table figure (values also suitable for Table 2)."""
-    rows = []
-    for name, label in [
-        ("dummy", "Dummy"),
-        ("csp_lda", "CSP-LDA"),
-        ("tangent_lr", "Riemannian-LR"),
-        ("erd_lr", "ERD-LR (primary)"),
-    ]:
-        s = load_json(E01 / f"{name}/summary.json")
-        rows.append(
-            {
-                "model": label,
-                "BAcc": s["balanced_accuracy"],
-                "ROC-AUC": s["roc_auc"],
-                "Macro-F1": s["macro_f1"],
-                "Sensitivity": s["sensitivity"],
-                "Specificity": s["specificity"],
-                "MCC": s["mcc"],
-                "N": int(s["n_participants"]),
-            }
-        )
+def figure_s1() -> None:
+    el = pd.read_csv(QC / "participant_eligibility.csv")
+    n_all = len(el)
+    n_prim = int(el["eligible_primary"].sum()) if "eligible_primary" in el.columns else int(el.iloc[:, -1].sum())
+    export_json("Figure_S1_source.json", {"n_audited": n_all, "n_primary": n_prim})
+    fig, ax = plt.subplots(figsize=(3.5, 3.2))
+    ax.axis("off")
+    for y, lab in ((0.75, f"Audited\nN={n_all}"), (0.45, f"Primary eligible\nN={n_prim}"), (0.15, "Primary E01\nnested CV")):
+        ax.add_patch(mpatches.FancyBboxPatch((0.2, y), 0.6, 0.18, transform=ax.transAxes, boxstyle="round,pad=0.02", fc="white", ec=BLACK, lw=0.7))
+        ax.text(0.5, y + 0.09, lab, transform=ax.transAxes, ha="center", va="center", fontsize=8)
+    ax.annotate("", xy=(0.5, 0.63), xytext=(0.5, 0.75), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="->", color=BLACK))
+    ax.annotate("", xy=(0.5, 0.33), xytext=(0.5, 0.45), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="->", color=BLACK))
+    ax.set_title("Cohort eligibility", fontsize=9)
+    save_figure(fig, "Figure_S1_Cohort_Eligibility", main=False)
+
+
+def figure_s2_secondary_table() -> None:
+    s = load_json(E01 / "erd_lr/summary.json")
+    rows = [
+        {"metric": "BAcc (primary)", "value": s["balanced_accuracy"], "role": "primary"},
+        {"metric": "ROC-AUC", "value": s["roc_auc"], "role": "secondary"},
+        {"metric": "Macro-F1", "value": s["macro_f1"], "role": "secondary"},
+        {"metric": "Sensitivity", "value": s["sensitivity"], "role": "secondary"},
+        {"metric": "Specificity", "value": s["specificity"], "role": "secondary"},
+        {"metric": "Average precision", "value": s["average_precision"], "role": "secondary"},
+        {"metric": "MCC", "value": s["mcc"], "role": "secondary"},
+        {"metric": "Accuracy", "value": s["accuracy"], "role": "secondary"},
+    ]
     df = pd.DataFrame(rows)
-    export_source("Figure_S2_source.csv", df)
-    fig, ax = plt.subplots(figsize=(10, 2.8))
+    export_csv("Figure_S2_source.csv", df)
+    # Prefer table recommendation — still export compact visual
+    fig, ax = plt.subplots(figsize=(5.5, 2.6))
     ax.axis("off")
     disp = df.copy()
-    for c in ["BAcc", "ROC-AUC", "Macro-F1", "Sensitivity", "Specificity", "MCC"]:
-        disp[c] = disp[c].map(lambda v: f"{v:.3f}")
-    table = ax.table(
-        cellText=disp.values,
-        colLabels=disp.columns,
-        loc="center",
-        cellLoc="center",
-    )
-    table.auto_set_font_size(False)
-    table.set_fontsize(8)
-    table.scale(1.05, 1.4)
-    ax.set_title("Figure S2 — Full secondary metrics (descriptive; BAcc primary)", pad=12)
+    disp["value"] = disp["value"].map(lambda v: f"{v:.3f}")
+    tbl = ax.table(cellText=disp[["metric", "value", "role"]].values, colLabels=["Metric", "Value", "Role"], loc="center", cellLoc="center")
+    tbl.auto_set_font_size(False)
+    tbl.set_fontsize(8)
+    tbl.scale(1.1, 1.35)
+    ax.set_title("Secondary metrics (prefer Table 2)", fontsize=9, pad=8)
     save_figure(fig, "Figure_S2_Secondary_Metrics", main=False)
 
 
-def figure_s6_laterality() -> None:
+def figure_s3_movement() -> None:
+    keys = ["left_fist", "right_fist", "both_fists", "both_feet", "unilateral", "bilateral"]
+    titles = ["Left fist", "Right fist", "Both fists", "Both feet", "Unilateral", "Bilateral"]
+    rows = []
+    fig, axes = plt.subplots(2, 3, figsize=(7.2, 4.6), sharex=True, sharey=True)
+    for ax, key, title in zip(axes.ravel(), keys, titles):
+        pm = pd.read_csv(E02 / key / "participant_metrics.csv")
+        m, lo, hi = boot_ci(E02 / key / "bootstrap_summary.csv")
+        n = int(load_json(E02 / key / "summary.json")["n_participants"])
+        rows.append({"movement": key, "n": n, "bacc": m, "ci_low": lo, "ci_high": hi})
+        export_csv(f"Figure_S3_{key}_source.csv", pm[["subject", "balanced_accuracy"]])
+        parts = ax.violinplot(pm["balanced_accuracy"], positions=[0], showextrema=False, widths=0.7)
+        for b in parts["bodies"]:
+            b.set_facecolor(PRIMARY)
+            b.set_alpha(0.25)
+        ax.scatter(np.zeros(len(pm)), pm["balanced_accuracy"], s=6, c=PRIMARY, alpha=0.4, edgecolors="none")
+        ax.errorbar(0.35, m, yerr=[[m - lo], [hi - m]], fmt="o", color=BLACK, ms=4, capsize=2)
+        chance_hline(ax)
+        ax.set_xticks([])
+        ax.set_title(f"{title} (N={n})", fontsize=8)
+        ax.set_ylim(0.35, 0.95)
+    for ax in axes[:, 0]:
+        ax.set_ylabel("BAcc")
+    export_csv("Figure_S3_summary.csv", pd.DataFrame(rows))
+    fig.suptitle("Movement-specific decoding", fontsize=9, y=1.01)
+    fig.tight_layout()
+    save_figure(fig, "Figure_S3_Movement_Decoding", main=False)
+
+
+def figure_s4_channels() -> None:
+    ch = pd.read_csv(E03 / "channel_summary_fdr.csv")
+    export_csv("Figure_S4_source.csv", ch)
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 4.2))
+    for ax, band, col in zip(axes, ["mu", "beta"], [MU, BETA]):
+        sub = ch.loc[ch.band == band].sort_values("mean")
+        ax.errorbar(
+            sub["mean"],
+            np.arange(len(sub)),
+            xerr=[
+                sub["mean"] - sub["mean_bootstrap_ci_low"],
+                sub["mean_bootstrap_ci_high"] - sub["mean"],
+            ],
+            fmt="o",
+            color=col,
+            ms=3.5,
+            capsize=1.5,
+            elinewidth=0.7,
+        )
+        ax.axvline(0, color=CHANCE, ls="--", lw=0.8)
+        ax.set_yticks(np.arange(len(sub)))
+        ax.set_yticklabels(sub["channel"], fontsize=6)
+        ax.set_xlabel("ME − MI (dB)")
+        ax.set_title(band)
+    fig.suptitle("Channel-level ERD", fontsize=9, y=1.01)
+    fig.tight_layout()
+    save_figure(fig, "Figure_S4_Channel_ERD", main=False)
+
+
+def figure_s5_laterality() -> None:
     lat = pd.read_csv(E03 / "laterality.csv")
-    export_source("Figure_S6_source.csv", lat)
-    fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.0), sharey=True)
+    export_csv("Figure_S5_source.csv", lat)
+    fig, axes = plt.subplots(1, 2, figsize=(6.5, 3.2), sharey=True)
     for ax, band in zip(axes, ["mu", "beta"]):
-        panel_label(ax, "A" if band == "mu" else "B")
         sub = lat.loc[lat.band == band]
-        groups = ["left_fist", "right_fist"]
-        data = [sub.loc[sub.movement == g, "laterality_me_minus_mi"].to_numpy() for g in groups]
+        data = [sub.loc[sub.movement == g, "laterality_me_minus_mi"].to_numpy() for g in ["left_fist", "right_fist"]]
         parts = ax.violinplot(data, positions=[0, 1], showmeans=True, showextrema=False, widths=0.7)
         for b in parts["bodies"]:
-            b.set_facecolor(PURPLE)
-            b.set_alpha(0.35)
-        ax.axhline(0, color=CHANCE, ls="--", lw=1)
+            b.set_facecolor(NULL)
+            b.set_alpha(0.3)
+        ax.axhline(0, color=CHANCE, ls="--", lw=0.8)
         ax.set_xticks([0, 1])
         ax.set_xticklabels(["Left fist", "Right fist"])
-        ax.set_title(f"{band} laterality (ME − MI)")
-        ax.set_ylabel("Laterality index difference" if band == "mu" else "")
-    fig.suptitle("Figure S6 — Laterality (SECONDARY; heterogeneous)", y=1.02, fontsize=10)
-    fig.text(0.5, -0.02, "Participant-level frozen E03 laterality; exploratory/secondary.", ha="center", fontsize=8, style="italic", color=GRAY)
+        ax.set_title(band)
+    axes[0].set_ylabel("Laterality (ME − MI)")
+    fig.suptitle("Laterality (secondary)", fontsize=9, y=1.02)
     fig.tight_layout()
-    save_figure(fig, "Figure_S6_Laterality", main=False)
+    save_figure(fig, "Figure_S5_Laterality", main=False)
 
 
-def figure_s8_artifact_distributions() -> None:
-    fig, axes = plt.subplots(1, 3, figsize=(11, 3.6), sharey=True)
-    for ax, key, title in zip(
-        axes,
-        ["none", "150uv", "200uv"],
-        ["No rejection", "150 µV", "200 µV (primary)"],
-    ):
+def figure_s6_heterogeneity() -> None:
+    pm = pd.read_csv(E01 / "erd_lr/participant_metrics.csv").sort_values("balanced_accuracy")
+    ranks = pd.read_csv(REV / "e04_participant_ranks.csv") if (REV / "e04_participant_ranks.csv").exists() else pm.assign(rank=np.arange(1, len(pm) + 1))
+    corr = pd.read_csv(REV / "e04_exploratory_correlations_copy.csv") if (REV / "e04_exploratory_correlations_copy.csv").exists() else None
+    export_csv("Figure_S6_ranks.csv", ranks)
+    if corr is not None:
+        export_csv("Figure_S6_correlations.csv", corr)
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.2))
+    ax = axes[0]
+    ax.plot(np.arange(1, len(pm) + 1), pm["balanced_accuracy"], color=PRIMARY, lw=1.0)
+    chance_hline(ax)
+    ax.set_xlabel("Rank")
+    ax.set_ylabel("BAcc")
+    ax.set_title("Participant ranks (exploratory)")
+    ax = axes[1]
+    ax.axis("off")
+    if corr is not None:
+        ax.text(0.01, 0.99, "Exploratory correlations (frozen):\n\n" + corr.to_string(index=False), va="top", family="monospace", fontsize=6.5)
+    fig.suptitle("Participant heterogeneity — EXPLORATORY", fontsize=9, y=1.02)
+    fig.tight_layout()
+    save_figure(fig, "Figure_S6_Participant_Heterogeneity", main=False)
+
+
+def figure_s7_artifact() -> None:
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.8), sharey=True)
+    for ax, key, title in zip(axes, ["none", "150uv", "200uv"], ["No rejection", "150 µV", "200 µV"]):
         pm = pd.read_csv(E05 / f"artifact_sensitivity/{key}/participant_metrics.csv")
-        export_source(f"Figure_S8_{key}_source.csv", pm[["subject", "balanced_accuracy"]])
-        ax.hist(pm["balanced_accuracy"], bins=18, color=PRIMARY, edgecolor="white", lw=0.3)
-        ax.axvline(0.5, color=CHANCE, ls="--", lw=1)
+        m, lo, hi = boot_ci(E05 / f"artifact_sensitivity/{key}/bootstrap_summary.csv")
         n = int(load_json(E05 / f"artifact_sensitivity/{key}/summary.json")["n_participants"])
-        ax.set_title(f"{title}\nN={n}")
-        ax.set_xlabel("BAcc")
-    axes[0].set_ylabel("Participants")
-    fig.suptitle("Figure S8 — Artifact-threshold participant distributions", y=1.05, fontsize=10)
+        export_csv(f"Figure_S7_{key}_source.csv", pm[["subject", "balanced_accuracy"]])
+        parts = ax.violinplot(pm["balanced_accuracy"], positions=[0], showextrema=False, widths=0.7)
+        for b in parts["bodies"]:
+            b.set_facecolor(PRIMARY)
+            b.set_alpha(0.25)
+        ax.scatter(np.zeros(len(pm)), pm["balanced_accuracy"], s=6, c=PRIMARY, alpha=0.4, edgecolors="none")
+        ax.errorbar(0.35, m, yerr=[[m - lo], [hi - m]], fmt="o", color=BLACK, ms=4, capsize=2)
+        chance_hline(ax)
+        ax.set_xticks([])
+        ax.set_title(f"{title}\nN={n}, {m:.3f}", fontsize=8)
+        ax.set_ylim(0.35, 0.95)
+    axes[0].set_ylabel("BAcc")
+    fig.suptitle("Artifact-threshold sensitivity", fontsize=9, y=1.05)
     fig.tight_layout()
-    save_figure(fig, "Figure_S8_Artifact_Distributions", main=False)
+    save_figure(fig, "Figure_S7_Artifact_Sensitivity", main=False)
 
 
-def figure_s_secondary_and_comparators() -> None:
-    # S2 secondary already partly in Fig2D; S3 comparator distributions
-    fig, axes = plt.subplots(1, 4, figsize=(12, 3.8), sharey=True)
+def figure_s8_rejection() -> None:
+    rej = load_json(SENS / "rejection_audit/rejection_audit_summary.json")
+    part = pd.read_csv(SENS / "rejection_audit/participant_paired_rejection_differences.csv")
+    export_json("Figure_S8_summary.json", rej)
+    export_csv("Figure_S8_participant_delta.csv", part)
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.0))
+    ax = axes[0]
+    me = rej["primary_cohort"]["ME"]
+    mi = rej["primary_cohort"]["MI"]
+    ax.scatter([0, 1], [me["rejection_proportion"] * 100, mi["rejection_proportion"] * 100], s=50, c=[ME, MI], edgecolors=BLACK, zorder=3)
+    ax.set_xticks([0, 1])
+    ax.set_xticklabels(["ME", "MI"])
+    ax.set_ylabel("Rejection (%)")
+    ax.set_xlim(-0.5, 1.5)
+    ax.set_title("Aggregate rejection")
+    ax.text(
+        0.98,
+        0.95,
+        f"retained {me['epochs_retained']}/{mi['epochs_retained']}",
+        transform=ax.transAxes,
+        ha="right",
+        va="top",
+        fontsize=6.5,
+    )
+    ax = axes[1]
+    # find delta column
+    dcol = [c for c in part.columns if "diff" in c.lower() or "minus" in c.lower()][0]
+    d = part[dcol].to_numpy() * (100 if part[dcol].abs().max() < 1 else 1)
+    parts = ax.violinplot(d, positions=[0], showextrema=False, widths=0.7)
+    for b in parts["bodies"]:
+        b.set_facecolor(PRIMARY)
+        b.set_alpha(0.25)
+    ax.scatter(np.zeros(len(d)), d, s=8, c=PRIMARY, alpha=0.45, edgecolors="none")
+    pp = rej["participant_paired"]
+    ax.errorbar(
+        0.35,
+        pp["mean_me_minus_mi"] * 100,
+        yerr=[
+            [pp["mean_me_minus_mi"] * 100 - pp["bootstrap_ci_low"] * 100],
+            [pp["bootstrap_ci_high"] * 100 - pp["mean_me_minus_mi"] * 100],
+        ],
+        fmt="o",
+        color=BLACK,
+        ms=4,
+        capsize=2,
+    )
+    ax.axhline(0, color=CHANCE, ls="--", lw=0.8)
+    ax.set_xticks([])
+    ax.set_ylabel("ME − MI rejection (pp)")
+    ax.set_title("Participant paired Δ")
+    fig.suptitle("Label-specific rejection audit", fontsize=9, y=1.02)
+    fig.tight_layout()
+    save_figure(fig, "Figure_S8_Rejection_Audit", main=False)
+
+
+def figure_s9_e08() -> None:
+    by_run = pd.read_csv(REV / "e08_by_run.csv").copy()
+    by_run["precue_beta_uv2"] = by_run["precue_beta_mean"] * V2_TO_UV2
+    by_run["precue_mu_uv2"] = by_run["precue_mu_mean"] * V2_TO_UV2
+    export_csv("Figure_S9_source.csv", by_run)
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.8))
+    for ax, col, ylab, title in zip(
+        axes,
+        ["precue_mu_uv2", "precue_beta_uv2", "ptp_mean"],
+        ["µV²", "µV²", "µV"],
+        ["Pre-cue μ", "Pre-cue β", "PTP"],
+    ):
+        for cond, color, lab in [("execution", ME, "ME"), ("imagery", MI, "MI")]:
+            sub = by_run.loc[by_run["condition"] == cond]
+            ax.plot(sub["run"], sub[col], "o-", color=color, label=lab, ms=3.5, lw=1)
+        ax.set_title(title)
+        ax.set_xlabel("Run")
+        ax.set_ylabel(ylab)
+        ax.legend(frameon=False, fontsize=6)
+    fig.suptitle("E08 protocol/run-state diagnostics", fontsize=9, y=1.05)
+    fig.tight_layout()
+    save_figure(fig, "Figure_S9_E08_Diagnostics", main=False)
+
+
+def figure_s10_sampling_duration() -> None:
+    samp = load_json(SENS / "sampling_rate/sampling_rate_sensitivity_summary.json")
+    pm = pd.read_csv(SENS / "sampling_rate/participant_metrics.csv")
+    sens = pd.read_csv(REV / "sensitivity_summary.csv")
+    export_json("Figure_S10_sampling.json", samp)
+    export_csv("Figure_S10_sampling_participants.csv", pm[["subject", "balanced_accuracy"]])
+    fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.9))
+    ax = axes[0]
+    rows = []
+    for analysis, label in [("E01_primary", "Primary"), ("E06_first60", "First 60 s"), ("E06_all_events", "All events")]:
+        r = sens.loc[sens.analysis == analysis].iloc[0]
+        rows.append((label, float(r.bacc), float(r.ci_low), float(r.ci_high), int(r.n)))
+    rows.append(("Sampling-rate", samp["sensitivity_bacc"], samp["sensitivity_ci"][0], samp["sensitivity_ci"][1], samp["sensitivity_n"]))
+    y = np.arange(len(rows))
+    ax.errorbar(
+        [r[1] for r in rows],
+        y,
+        xerr=[[r[1] - r[2] for r in rows], [r[3] - r[1] for r in rows]],
+        fmt="o",
+        color=PRIMARY,
+        ecolor=BLACK,
+        ms=4,
+        capsize=2,
+    )
+    chance_vline(ax)
+    ax.set_yticks(y)
+    ax.set_yticklabels([f"{r[0]} (N={r[4]})" for r in rows], fontsize=7)
+    ax.set_xlabel("BAcc")
+    ax.set_title("Duration / sampling-rate")
+    ax = axes[1]
+    parts = ax.violinplot(pm["balanced_accuracy"], positions=[0], showextrema=False, widths=0.7)
+    for b in parts["bodies"]:
+        b.set_facecolor(CONTROL)
+        b.set_alpha(0.3)
+    ax.scatter(np.zeros(len(pm)), pm["balanced_accuracy"], s=6, c=CONTROL, alpha=0.4, edgecolors="none")
+    chance_hline(ax)
+    ax.set_xticks([])
+    ax.set_ylabel("BAcc")
+    ax.set_title(f"Sampling-rate cohort (N={samp['sensitivity_n']})")
+    fig.tight_layout()
+    save_figure(fig, "Figure_S10_Sampling_Duration", main=False)
+
+
+def figure_s11_comparators() -> None:
+    fig, axes = plt.subplots(1, 4, figsize=(7.2, 2.6), sharey=True)
     for ax, key, title, color in zip(
         axes,
         ["dummy", "csp_lda", "tangent_lr", "erd_lr"],
         ["Dummy", "CSP-LDA", "Riemannian-LR", "ERD-LR"],
-        [GRAY, "#56B4E9", CONTROL, PRIMARY],
+        [NEUTRAL, CONTROL, CONTROL, PRIMARY],
     ):
         pm = pd.read_csv(E01 / f"{key}/participant_metrics.csv")
-        export_source(f"Figure_S3_{key}_source.csv", pm[["subject", "balanced_accuracy"]])
-        ax.hist(pm["balanced_accuracy"], bins=20, color=color, edgecolor="white", lw=0.3)
-        ax.axvline(0.5, color=CHANCE, ls="--", lw=1)
-        ax.set_title(title)
+        export_csv(f"Figure_S11_{key}_source.csv", pm[["subject", "balanced_accuracy"]])
+        ax.hist(pm["balanced_accuracy"], bins=18, color=color, edgecolor="white", lw=0.3)
+        chance_vline(ax) if False else ax.axvline(0.5, color=CHANCE, ls="--", lw=0.8)
+        ax.set_title(title, fontsize=8)
         ax.set_xlabel("BAcc")
-    axes[0].set_ylabel("Participants")
-    fig.suptitle("Figure S3 — Participant-level comparator distributions", y=1.02, fontsize=10)
+    axes[0].set_ylabel("Count")
+    fig.suptitle("Comparator participant distributions", fontsize=9, y=1.05)
     fig.tight_layout()
-    save_figure(fig, "Figure_S3_Comparator_Distributions", main=False)
-
-
-def figure_s_movement_distributions() -> None:
-    fig, axes = plt.subplots(2, 3, figsize=(11, 6.5), sharex=True, sharey=True)
-    keys = ["left_fist", "right_fist", "both_fists", "both_feet", "unilateral", "bilateral"]
-    titles = ["Left fist", "Right fist", "Both fists", "Both feet", "Unilateral", "Bilateral"]
-    for ax, key, title in zip(axes.ravel(), keys, titles):
-        pm = pd.read_csv(E02 / key / "participant_metrics.csv")
-        export_source(f"Figure_S4_{key}_source.csv", pm[["subject", "balanced_accuracy"]])
-        ax.hist(pm["balanced_accuracy"], bins=18, color=PRIMARY, edgecolor="white", lw=0.3)
-        ax.axvline(0.5, color=CHANCE, ls="--", lw=1)
-        n = pm["subject"].nunique() if "subject" in pm else len(pm)
-        ax.set_title(f"{title} (N={n})")
-    for ax in axes[:, 0]:
-        ax.set_ylabel("Count")
-    for ax in axes[1, :]:
-        ax.set_xlabel("BAcc")
-    fig.suptitle("Figure S4 — Movement-specific participant BAcc", y=1.01, fontsize=10)
-    fig.tight_layout()
-    save_figure(fig, "Figure_S4_Movement_Distributions", main=False)
-
-
-def figure_s_channel_fdr() -> None:
-    ch = pd.read_csv(E03 / "channel_summary_fdr.csv")
-    export_source("Figure_S5_source.csv", ch)
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4.5))
-    for ax, band in zip(axes, ["mu", "beta"]):
-        sub = ch.loc[ch.band == band].sort_values("mean")
-        ax.barh(sub["channel"], sub["mean"], color=PRIMARY, edgecolor=BLACK, lw=0.2, height=0.75)
-        ax.axvline(0, color=CHANCE, ls="--", lw=1)
-        ax.set_title(f"{band} ME−MI channel effects")
-        ax.set_xlabel("Mean ME − MI (dB)")
-    fig.suptitle("Figure S5 — Channel-level ERD effects (all FDR-significant in freeze)", y=1.02, fontsize=10)
-    fig.tight_layout()
-    save_figure(fig, "Figure_S5_Channel_ERD", main=False)
-
-
-def figure_s_heterogeneity() -> None:
-    pm = pd.read_csv(E01 / "erd_lr/participant_metrics.csv").sort_values("balanced_accuracy")
-    ranks = pd.read_csv(REV / "e04_participant_ranks.csv") if (REV / "e04_participant_ranks.csv").exists() else pm.assign(rank=np.arange(1, len(pm) + 1))
-    corr = pd.read_csv(REV / "e04_exploratory_correlations_copy.csv") if (REV / "e04_exploratory_correlations_copy.csv").exists() else None
-    export_source("Figure_S7_source_ranks.csv", ranks)
-    if corr is not None:
-        export_source("Figure_S7_source_correlations.csv", corr)
-
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-    ax = axes[0]
-    panel_label(ax, "A")
-    ax.plot(np.arange(1, len(pm) + 1), pm["balanced_accuracy"].to_numpy(), color=PRIMARY, lw=1.2)
-    ax.axhline(0.5, color=CHANCE, ls="--", lw=1)
-    ax.set_xlabel("Participant rank")
-    ax.set_ylabel("BAcc")
-    ax.set_title("Participant heterogeneity (EXPLORATORY)")
-    ax = axes[1]
-    panel_label(ax, "B")
-    if corr is not None and len(corr):
-        ax.axis("off")
-        txt = corr.to_string(index=False)
-        ax.text(0.01, 0.99, "Exploratory correlations (verbatim frozen):\n\n" + txt, va="top", family="monospace", fontsize=7)
-    else:
-        ax.axis("off")
-        ax.text(0.5, 0.5, "No exploratory correlation table found", ha="center")
-    fig.suptitle("Figure S7 — Participant heterogeneity (EXPLORATORY)", y=1.02, fontsize=10)
-    fig.tight_layout()
-    save_figure(fig, "Figure_S7_Participant_Heterogeneity", main=False)
-
-
-def figure_s_rejection_full() -> None:
-    by = pd.read_csv(SENS / "rejection_audit/rejection_by_condition.csv")
-    mov = pd.read_csv(SENS / "rejection_audit/rejection_by_movement_primary_cohort.csv")
-    export_source("Figure_S9_condition_source.csv", by)
-    export_source("Figure_S9_movement_source.csv", mov)
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-    ax = axes[0]
-    prim = by.loc[by.scope == "e01_primary_cohort"]
-    ax.bar(prim["condition"], prim["rejection_proportion"] * 100, color=[PRIMARY, SECONDARY], edgecolor=BLACK)
-    ax.set_ylabel("Rejection %")
-    ax.set_title("Primary-cohort rejection by label")
-    ax = axes[1]
-    labels = [f"{r.movement}\n{r.condition}" for r in mov.itertuples()]
-    ax.barh(np.arange(len(mov)), mov["rejection_proportion"] * 100, color=PRIMARY, edgecolor=BLACK, lw=0.3)
-    ax.set_yticks(np.arange(len(mov)))
-    ax.set_yticklabels(labels, fontsize=7)
-    ax.set_xlabel("Rejection %")
-    ax.set_title("Movement × condition (primary cohort)")
-    fig.suptitle("Figure S9 — Label-specific rejection audit", y=1.02, fontsize=10)
-    fig.tight_layout()
-    save_figure(fig, "Figure_S9_Rejection_Audit", main=False)
-
-
-def figure_s_e08_expanded() -> None:
-    by_run = pd.read_csv(REV / "e08_by_run.csv")
-    export_source("Figure_S10_source.csv", by_run)
-    fig, axes = plt.subplots(1, 3, figsize=(12, 3.8))
-    for ax, col, title in zip(
-        axes,
-        ["precue_mu_mean", "precue_beta_mean", "ptp_mean"],
-        ["Pre-cue μ", "Pre-cue β", "PTP"],
-    ):
-        for cond, color in [("execution", PRIMARY), ("imagery", SECONDARY)]:
-            sub = by_run.loc[by_run["condition"] == cond]
-            ax.plot(sub["run"], sub[col], "o-", color=color, label=cond, ms=4)
-        ax.set_title(title)
-        ax.set_xlabel("Run")
-        ax.legend(frameon=False, fontsize=7)
-    fig.suptitle("Figure S10 — Expanded E08 run diagnostics (diagnostic only)", y=1.05, fontsize=10)
-    fig.tight_layout()
-    save_figure(fig, "Figure_S10_E08_Run_Diagnostics", main=False)
-
-
-def figure_s_sampling_rate() -> None:
-    s = load_json(SENS / "sampling_rate/sampling_rate_sensitivity_summary.json")
-    pm = pd.read_csv(SENS / "sampling_rate/participant_metrics.csv")
-    export_source("Figure_S11_source_summary.csv", pm[["subject", "balanced_accuracy"]])
-    export_source_json("Figure_S11_annotations.json", s)
-    fig, axes = plt.subplots(1, 2, figsize=(9, 3.8))
-    ax = axes[0]
-    ax.bar([0, 1], [s["primary_bacc"], s["sensitivity_bacc"]], color=[PRIMARY, CONTROL], edgecolor=BLACK, width=0.6)
-    ax.errorbar(
-        [0, 1],
-        [s["primary_bacc"], s["sensitivity_bacc"]],
-        yerr=[
-            [s["primary_bacc"] - s["primary_ci"][0], s["sensitivity_bacc"] - s["sensitivity_ci"][0]],
-            [s["primary_ci"][1] - s["primary_bacc"], s["sensitivity_ci"][1] - s["sensitivity_bacc"]],
-        ],
-        fmt="none",
-        ecolor=BLACK,
-        capsize=4,
-    )
-    ax.axhline(0.5, color=CHANCE, ls="--", lw=1)
-    ax.set_xticks([0, 1])
-    ax.set_xticklabels([f"Primary\nN={s['primary_n']}", f"Excl. 128 Hz\nN={s['sensitivity_n']}"])
-    ax.set_ylim(0.45, 0.70)
-    ax.set_ylabel("BAcc")
-    ax.set_title(f"Sampling-rate sensitivity ({s['conclusion']})")
-    ax = axes[1]
-    ax.hist(pm["balanced_accuracy"], bins=18, color=CONTROL, edgecolor="white")
-    ax.axvline(0.5, color=CHANCE, ls="--", lw=1)
-    ax.set_xlabel("Participant BAcc")
-    ax.set_ylabel("Count")
-    ax.set_title("N=99 participant distribution")
-    fig.tight_layout()
-    save_figure(fig, "Figure_S11_Sampling_Rate", main=False)
-
-
-def figure_s1_cohort_flow() -> None:
-    """Eligibility flow from frozen eligibility file (counts only)."""
-    el = pd.read_csv(ROOT / "results/definitive/full/qc/participant_eligibility.csv")
-    n_all = len(el)
-    n_prim = int(el["eligible_primary"].sum())
-    export_source_json("Figure_S1_source.json", {"n_audited": n_all, "n_primary": n_prim})
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.axis("off")
-    boxes = [
-        (0.2, 0.75, f"Audited subjects\nN={n_all}"),
-        (0.2, 0.45, f"Primary eligible\nN={n_prim}"),
-        (0.2, 0.15, "Primary E01 nested CV\nparticipant-mean BAcc"),
-    ]
-    for x, y, lab in boxes:
-        ax.add_patch(mpatches.FancyBboxPatch((x, y), 0.6, 0.18, transform=ax.transAxes, boxstyle="round,pad=0.02", fc=LIGHT, ec=BLACK))
-        ax.text(x + 0.3, y + 0.09, lab, transform=ax.transAxes, ha="center", va="center", fontsize=9)
-    ax.annotate("", xy=(0.5, 0.63), xytext=(0.5, 0.75), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="->", color=BLACK))
-    ax.annotate("", xy=(0.5, 0.33), xytext=(0.5, 0.45), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="->", color=BLACK))
-    ax.set_title("Figure S1 — Cohort / eligibility overview")
-    save_figure(fig, "Figure_S1_Cohort_Eligibility", main=False)
+    save_figure(fig, "Figure_S11_Comparator_Distributions", main=False)
 
 
 def make_contact_sheet() -> None:
     from matplotlib.backends.backend_pdf import PdfPages
     from PIL import Image
 
-    pngs = sorted((ROOT / "figures/main").glob("Figure_*.png")) + sorted((ROOT / "figures/supplementary").glob("Figure_*.png"))
-    if not pngs:
-        return
-    out = ROOT / "figures/previews/publication_figures_contact_sheet.pdf"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    with PdfPages(out) as pdf:
+    pngs = sorted((ROOT / "figures/main").glob("Figure_*.png")) + sorted(
+        (ROOT / "figures/supplementary").glob("Figure_*.png")
+    )
+    FIG_PREV.mkdir(parents=True, exist_ok=True)
+    out_pdf = FIG_PREV / "publication_figures_contact_sheet.pdf"
+    out_png = FIG_PREV / "publication_figures_contact_sheet.png"
+    pages = []
+    with PdfPages(out_pdf) as pdf:
         for i in range(0, len(pngs), 4):
             chunk = pngs[i : i + 4]
             fig, axes = plt.subplots(2, 2, figsize=(11, 8.5))
-            axes = axes.ravel()
-            for ax in axes:
+            for ax in axes.ravel():
                 ax.axis("off")
-            for ax, p in zip(axes, chunk):
-                im = Image.open(p)
-                ax.imshow(im)
+            for ax, p in zip(axes.ravel(), chunk):
+                ax.imshow(Image.open(p))
                 ax.set_title(p.stem, fontsize=8)
                 ax.axis("off")
             fig.tight_layout()
             pdf.savefig(fig)
+            pages.append(fig)
+            # keep last page for png overview of first page only after loop
+            if i == 0:
+                fig.savefig(out_png, dpi=200, bbox_inches="tight")
             plt.close(fig)
 
 
 def main() -> int:
     apply_style()
-    print("Generating Figure 1...")
-    figure_1_study_design()
-    print("Generating Figure 2...")
-    figure_2_primary()
-    print("Generating Figure 3...")
-    figure_3_precue_postcue()
-    print("Generating Figure 4...")
-    figure_4_physiology_spatial()
-    print("Generating Figure 5...")
-    figure_5_robustness()
-    print("Generating supplementary...")
-    figure_s1_cohort_flow()
-    figure_s2_secondary_metrics_tablefig()
-    figure_s_secondary_and_comparators()
-    figure_s_movement_distributions()
-    figure_s_channel_fdr()
-    figure_s6_laterality()
-    figure_s_heterogeneity()
-    figure_s8_artifact_distributions()
-    figure_s_rejection_full()
-    figure_s_e08_expanded()
-    figure_s_sampling_rate()
+    print("Figure 1...")
+    figure_1()
+    print("Figure 2...")
+    figure_2()
+    print("Figure 3...")
+    figure_3()
+    print("Figure 4...")
+    figure_4()
+    print("Figure 5...")
+    figure_5()
+    print("Supplementary...")
+    figure_s1()
+    figure_s2_secondary_table()
+    figure_s3_movement()
+    figure_s4_channels()
+    figure_s5_laterality()
+    figure_s6_heterogeneity()
+    figure_s7_artifact()
+    figure_s8_rejection()
+    figure_s9_e08()
+    figure_s10_sampling_duration()
+    figure_s11_comparators()
     print("Contact sheet...")
     make_contact_sheet()
     print("DONE")

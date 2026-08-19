@@ -1,4 +1,0 @@
-analysis,predictor,outcome,spearman_rho,p_uncorrected,p_fdr
-E04_exploratory,mean_abs_erd,balanced_accuracy,0.0828729594226555,0.4076216543591613,0.6733090184914131
-E04_exploratory,n_epochs_erd,balanced_accuracy,-0.0422477412525775,0.6733090184914131,0.6733090184914131
-E04_exploratory,mean_rejection_rate,balanced_accuracy,,,
